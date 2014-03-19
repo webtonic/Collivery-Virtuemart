@@ -17,6 +17,7 @@ AdminUIHelper::startAdminArea( $this );
 				<br />
 				<label for="password">Password:</label>
 				<input name="password" id="password" value="<?php echo $this->config->password;?>" size="30">
+				<br />
 				<label for="risk_cover">Insurance up to R5000:</label>
 				( Include <input type="radio" name="risk_cover" id="risk_cover" value="1" <?php if($this->config->risk_cover == 1) {echo 'checked="checked" ';}?>> | Don't Include <input type="radio" name="risk_cover" value="0"<?php if($this->config->risk_cover == 0) {echo 'checked="checked" ';}?>> )
 				<p><input type="submit" value="Update"/></p>
