@@ -91,8 +91,8 @@ $document->addScriptDeclaration ( $box );
 							?>
 						</table>
 						<div id="wrapped_waybill" style="display:none;width:620px;height:500px;">
-							<iframe src="https://docs.google.com/gview?url=<?php echo $this->view_waybill;?>&embedded=true" style="width:500px; height:400px;" frameborder="0"></iframe>
-						</div>
+							<iframe src="<?php echo $this->view_waybill;?>" style="width:500px; height:400px;" frameborder="0"></iframe>
+						</div>						
 					</fieldset>
 				</td>
 				<td width="50%">

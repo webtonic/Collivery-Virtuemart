@@ -382,7 +382,8 @@ class VirtuemartViewMds extends VmView
 			$this->assignRef( 'tracking', $tracking );
 			$this->assignRef( 'pod', glob( $directory . "/*.{pdf,PDF}", GLOB_BRACE ) );
 			$this->assignRef( 'image_list', glob($directory . "/*.{jpg,JPG,jpeg,JPEG,gif,GIF,png,PNG}", GLOB_BRACE));
-			$this->assignRef( 'view_waybill', base64_encode('https://quote.collivery.co.za/waybillpdf.php?wb='.$waybill.'&output=I'));
+			$view_waybill = 'https://quote.collivery.co.za/waybillpdf.php?wb='.base64_encode($waybill).'&output=I';
+			$this->assignRef('view_waybill', $view_waybill);
 		} elseif ( $curTask == 'index' ) {
 			$this->setLayout( 'index' );
 
