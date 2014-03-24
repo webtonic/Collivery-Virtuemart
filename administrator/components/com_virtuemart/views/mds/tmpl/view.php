@@ -107,7 +107,8 @@ $document->addScriptDeclaration ( $box );
 									<td>
 										Proof of delivery: <a href="javascript:void(0);" rel="wrapped_pod" class="show_pod">View POD</a>
 										<div id="wrapped_pod" style="display:none;width:620px;height:500px;">
-											<iframe src="https://docs.google.com/gview?url=<?php echo $this->pod[0];?>&embedded=true" style="width:500px; height:400px;" frameborder="0"></iframe>
+											<iframe src="<?php echo 'https://quote.collivery.co.za/viewpod.php?id='.$this->order->waybill;?>" style="width:500px; height:400px;" frameborder="0"></iframe>
+<!--											<iframe src="https://docs.google.com/gview?url=<?php echo $this->pod[0];?>&embedded=true" style="width:500px; height:400px;" frameborder="0"></iframe>-->
 										</div>
 									</td>
 								</tr>
