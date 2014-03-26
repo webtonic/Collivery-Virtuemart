@@ -28,7 +28,9 @@ class VirtuemartViewMds extends VmView
 	var $default_contacts;
 	var $mds_services;
 	var $risk_cover;
-
+	var $username;
+	var $password;
+	
 	public function __construct()
 	{
 		parent::__construct();
@@ -266,53 +268,91 @@ class VirtuemartViewMds extends VmView
 			$this->assignRef( 'destination_location_types', $destination_location_types );
 		} elseif ( $curTask == 'awaiting_dispatch' ) {
 			$this->setLayout( 'index_dispatch' );
+			
+			// Older version check
+			if(preg_replace('/[1-9]/', "", $this->vm_version) != preg_replace('/[1-9]/', "", '2.0.26d'))
+			{
+				$model = VmModel::getModel();
+				$this->addStandardDefaultViewLists($model,'created_on');
+				$this->lists['state_list'] = $this->renderOrderstatesList();
+				$orderslist = $model->getOrdersList();
 
-			$model = VmModel::getModel();
-			$this->addStandardDefaultViewLists( $model, 'created_on' );
-			$orderStatusModel = VmModel::getModel( 'orderstatus' );
-			$orderstates = JRequest::getWord( 'order_status_code', '' );
-			$this->lists['state_list'] = $orderStatusModel->renderOSList( $orderstates, 'order_status_code', false, ' onchange="this.form.submit();" ' );
-			$orderslist = $model->getOrdersList();
+				$this->assignRef('orderstatuses', $orderStates);
 
-			$this->assignRef( 'orderstatuses', $orderStates );
+				if(!class_exists('CurrencyDisplay'))require(JPATH_VM_ADMINISTRATOR.DS.'helpers'.DS.'currencydisplay.php');
 
-			if ( ! class_exists( 'CurrencyDisplay' ) ) {
-				require JPATH_VM_ADMINISTRATOR . DS . 'helpers' . DS . 'currencydisplay.php';
-			}
+				/* Apply currency This must be done per order since it's vendor specific */
+				$_currencies = array(); // Save the currency data during this loop for performance reasons
+				if ($orderslist) {
+					foreach ($orderslist as $virtuemart_order_id => $order) {
 
-			/* Apply currency This must be done per order since it's vendor specific */
-			$_currencies = array(); // Save the currency data during this loop for performance reasons
+						//This is really interesting for multi-X, but I avoid to support it now already, lets stay it in the code
+						if (!array_key_exists('v'.$order->virtuemart_vendor_id, $_currencies)) {
+							$_currencies['v'.$order->virtuemart_vendor_id] = CurrencyDisplay::getInstance('',$order->virtuemart_vendor_id);
+						}
+						$order->order_total = $_currencies['v'.$order->virtuemart_vendor_id]->priceDisplay($order->order_total);
+						$order->invoiceNumber = $model->getInvoiceNumber($order->virtuemart_order_id);
 
-			if ( $orderslist ) {
-
-				foreach ( $orderslist as $virtuemart_order_id => $order ) {
-
-					if ( ! empty( $order->order_currency ) ) {
-						$currency = $order->order_currency;
-					} elseif ( $order->virtuemart_vendor_id ) {
-						if ( ! class_exists( 'VirtueMartModelVendor' ) )
-							require JPATH_VM_ADMINISTRATOR . DS . 'models' . DS . 'vendor.php';
-						$currObj = VirtueMartModelVendor::getVendorCurrency( $order->virtuemart_vendor_id );
-						$currency = $currObj->virtuemart_currency_id;
 					}
-					//This is really interesting for multi-X, but I avoid to support it now already, lets stay it in the code
-					if ( ! array_key_exists( 'curr' . $currency, $_currencies ) ) {
-
-						$_currencies['curr' . $currency] = CurrencyDisplay::getInstance( $currency, $order->virtuemart_vendor_id );
-					}
-
-					$order->order_total = $_currencies['curr' . $currency]->priceDisplay( $order->order_total );
-					$order->invoiceNumber = $model->getInvoiceNumber( $order->virtuemart_order_id );
 				}
+
+				/* Assign the data */
+				$this->assignRef('orderslist', $orderslist);
+				$this->assignRef( 'services', $this->services );
+				
+				$pagination = $model->getPagination();
+				$this->assignRef('pagination', $pagination);				
+				$this->SetViewTitle( 'MDS Confirm Collivery', 'MDS shipping awaiting confirmation' );				
 			}
+			else
+			{
+				$model = VmModel::getModel();
+				$this->addStandardDefaultViewLists( $model, 'created_on' );
+				$orderStatusModel = VmModel::getModel( 'orderstatus' );
+				$orderstates = JRequest::getWord( 'order_status_code', '' );
+				$this->lists['state_list'] = $orderStatusModel->renderOSList( $orderstates, 'order_status_code', false, ' onchange="this.form.submit();" ' );
+				$orderslist = $model->getOrdersList();
 
-			/* Assign the data */
-			$this->assignRef( 'orderslist', $orderslist );
-			$this->assignRef( 'services', $this->services );
+				$this->assignRef( 'orderstatuses', $orderStates );
 
-			$pagination = $model->getPagination();
-			$this->assignRef( 'pagination', $pagination );
-			$this->SetViewTitle( 'MDS Confirm Collivery', 'MDS shipping awaiting confirmation' );
+				if ( ! class_exists( 'CurrencyDisplay' ) ) {
+					require JPATH_VM_ADMINISTRATOR . DS . 'helpers' . DS . 'currencydisplay.php';
+				}
+
+				/* Apply currency This must be done per order since it's vendor specific */
+				$_currencies = array(); // Save the currency data during this loop for performance reasons
+
+				if ( $orderslist ) {
+
+					foreach ( $orderslist as $virtuemart_order_id => $order ) {
+
+						if ( ! empty( $order->order_currency ) ) {
+							$currency = $order->order_currency;
+						} elseif ( $order->virtuemart_vendor_id ) {
+							if ( ! class_exists( 'VirtueMartModelVendor' ) )
+								require JPATH_VM_ADMINISTRATOR . DS . 'models' . DS . 'vendor.php';
+							$currObj = VirtueMartModelVendor::getVendorCurrency( $order->virtuemart_vendor_id );
+							$currency = $currObj->virtuemart_currency_id;
+						}
+						//This is really interesting for multi-X, but I avoid to support it now already, lets stay it in the code
+						if ( ! array_key_exists( 'curr' . $currency, $_currencies ) ) {
+
+							$_currencies['curr' . $currency] = CurrencyDisplay::getInstance( $currency, $order->virtuemart_vendor_id );
+						}
+
+						$order->order_total = $_currencies['curr' . $currency]->priceDisplay( $order->order_total );
+						$order->invoiceNumber = $model->getInvoiceNumber( $order->virtuemart_order_id );
+					}
+				}
+
+				/* Assign the data */
+				$this->assignRef( 'orderslist', $orderslist );
+				$this->assignRef( 'services', $this->services );
+
+				$pagination = $model->getPagination();
+				$this->assignRef( 'pagination', $pagination );
+				$this->SetViewTitle( 'MDS Confirm Collivery', 'MDS shipping awaiting confirmation' );				
+			}
 		} elseif ( $curTask == 'config' ) {
 			$shippingModel = VmModel::getModel();
 			$post = JRequest::get( 'post' );

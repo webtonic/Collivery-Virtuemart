@@ -191,8 +191,16 @@ class plgVmShipmentMds_Shipping_Base extends vmPSPlugin
 		// Get town name from the database
 		$shippingModel = VmModel::getModel( 'mds' );
 		$state_name = $shippingModel->getState( $address['virtuemart_state_id'] );
-		$mds_service = $method->slug;
 
+		if($method->slug == "")
+		{
+			$mds_service = array_search($method->shipment_name, $this->services);
+		}
+		else
+		{
+			$mds_service = $method->slug;
+		}
+		
 		$to_town_id = array_search( $state_name, $this->collivery->getTowns() );
 		$to_town_type = $address['mds_location_type'];
 

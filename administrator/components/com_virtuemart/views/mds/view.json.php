@@ -20,7 +20,9 @@ class VirtuemartViewMds extends JView {
 	var $app_info;
 	var $collivery;
 	var $risk_cover;
-
+	var $username;
+	var $password;
+	
 	function __construct()
 	{
 		parent::__construct();
