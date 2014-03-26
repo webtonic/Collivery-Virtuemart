@@ -30,6 +30,7 @@ class VirtuemartViewMds extends VmView
 	var $risk_cover;
 	var $username;
 	var $password;
+	var $vm_version;
 	
 	public function __construct()
 	{
@@ -73,6 +74,7 @@ class VirtuemartViewMds extends VmView
 
 		$version = new JVersion();
 		require_once preg_replace( '|com_installer|i', "", JPATH_COMPONENT_ADMINISTRATOR ) . '/helpers/config.php';
+		$this->vm_version = VmConfig::getInstalledVersion();
 
 		$config = array(
 			'app_name' => $this->app_info->name, // Application Name
