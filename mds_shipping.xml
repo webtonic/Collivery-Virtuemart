@@ -16,7 +16,6 @@
 	</install>
 	<files>
 		<filename plugin="mds_shipping">mds_shipping.php</filename>
-		<filename>mds_shipping_base.php</filename>
 		<filename>UnitConvertor.php</filename>
 		<filename>jquery.min.js</filename>
 		<filename>index.html</filename>

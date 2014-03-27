@@ -28,6 +28,11 @@ class plgVmShipmentMds_ShippingInstallerScript
 	 */
 	public function __construct( JAdapterInstance $adapter )
 	{
+		// We have to check what php version we have before anything is installed.
+		if (version_compare(PHP_VERSION, '5.3.0') < 0) {
+			die('Your PHP version is not able to run this plugin, update to the latest version before instaling this plugin. <a href="'.JURI::base().'">Return</a>');
+		}
+		
 		// Load the database and execute our sql file
 		$this->db = JFactory::getDBO();
 		// Cant load any more here because our plugin is not yet installed so we have to do the rest from within install() and uninstall()
