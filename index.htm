@@ -29,6 +29,7 @@
 				• Joomla Version: 2.5<br />
 				• Virtuemart Version: 2.0<br />
 				• Hosting service with 'SoapClient' - Enabled
+				• MDS Collivery - Virtuemart Plugin <a href="https://github.com/Collivery/Collivery-Virtuemart/archive/master.zip">Download</a>
 			</p>
 			<p style="color: red;"><b>Make sure before installing this plugin that you make a full SQL database backup and a full backup of all your files. If for some reason something goes wrong you will need this backup to get your website back to where it was before.</b></p>
 			<section>
@@ -48,33 +49,33 @@
 					<h2><a name="instalation" href="#instalation">Installation</a></h2>
 				</header>
 				<p>Log in to your Administration section via http://yoursite.co.za/administrator/index.php and once you are logged in hold your mouse over Extensions link at the top of your page and then select extension manager from the drop down list.</p>
-				<pre><img src="images/extension manager.jpg"/></pre>
+				<img src="images/extension manager.jpg"/><br />
 				<p>Then you will need to select your plugin file by clicking browse under Upload Package File and then navigating to your plugin file.</p>
-				<pre><img src="images/select plugin.jpg"/></pre>
+				<img src="images/select plugin.jpg"/><br />
 				<p>Once the plugin is selected, click Upload & Install. That’s it, MDS Collivery plugin is installed and ready for action.</p>
-				<pre><img src="images/installed.jpg"/>
+				<img src="images/installed.jpg"/>
 			</section>
 			<section>
 				<header>
 					<h2><a name="admin_config" href="#admin_config">Configuration</a></h2>
 				</header>
 				<p class="description">We have some configuration settings to go through, the first being insurance on your deliveries, if you include insurance this setting will be passed onto the API so your clients receive an accurate price from the API. The other settings are your account username and password for your MDS Collivery account.  By default the plugin uses the demo account, you will need to update to your account settings! We have also included an update button there, this update function updates all towns, suburbs, location types and your shipping methods.</p>
-				<pre><img src="images/config.jpg"/></pre>
+				<img src="images/config.jpg"/><br />
 				<p>The other settings you need to be aware of is shipping methods, you can configure which delivery services you want to use as well as the mark-up for each service.  Under the Shop menu click on Shipment Methods, there you will see a list of all the delivery services the plugin has added.</p>
-				<pre><img src="images/shipment_methods.jpg"/></pre>
+				<img src="images/shipment_methods.jpg"/><br />
 				<p>If you select on one of the service’s you will have the ability to edit the descriptions, name and if you want your clients to use that service. Please note: Do not change Sef Alias as this is the unique id that the API uses to determine which service you using.</p>
-				<pre><img src="images/editing_service.jpg"/></pre>
+				<img src="images/editing_service.jpg"/><br />
 				<p>Additionally there is mark-up setting for each of the service's, this is just an input for the percentage you would like added to the price returned by the API for the checkout. By default there is a 10% markup.</p>
-				<pre><img src="images/editing_markup.jpg"/></pre>
+				<img src="images/editing_markup.jpg"/><br />
 				<p>We have one last configuration setting to go through. Our Client tracking page needs to be placed on your website, by default this is placed Main Menu but we can move this around. You will need to select Menus -> Menu Manager.</p>
-				<pre><img src="images/menu_manager.PNG"/></pre>
+				<img src="images/menu_manager.PNG"/><br />
 				<p>Then find and select MDS Tracking. Once you have opened MDS Tracking you can then edit where the link is meant to be displayed. our fist important setting is your Menu Item Type this should be set to External URL, the other major setting is Link this should be set to the following: index.php?option=com_virtuemart&view=mds&task=tracking and the rest is up to you.</p>
 				<p>Another setting we need to go through in order for the MDS Collivery plugin to function correctly is the jQuery version for Virtuemart. This setting is located in your admin section under Components -> Virtuemart. Once you are there select Configeration -> Configeration and then select Template Tab.</p>
-				<pre><img src="images/template_config.jpg"/></pre>
+				<img src="images/template_config.jpg"/><br />
 				<p>On the page locate "Use external google jQuery library" and make sure that box is unchecked.</p>
 				<p>Our final configuration is for the shopper fields that your client sees when checking out. These fields are your client’s personal details, we have added some new fields and we need to change the order of them so they align correctly in your checkout pages.</p>
 				<p>To do this you need to be in your admin section and select Components -> Virtuemart. Once you are in Virtuemart admin section you will need to select Configeration -> Shopper Fields. Once you are there we need to group the following fields together: virtuemart_country_id, virtuemart_state_id, mds_suburb_id, mds_location_type, mds_building_details. You can do this by using the little up and down arrows under the Reorder colum. We normally align them under address_2 but this is your site so move them around as you wish.</p>
-				<pre><pre><img src="images/shopper_fields.jpg"/></pre>
+				<pre><img src="images/shopper_fields.jpg"/><br />
 				<p>Since we have added some new fields you might have to disable some of your old fields, you can do this by viewing the checkout page where you enter your billing of shipping address and see what there could be disabled. Make sure none of the plugin fields are disabled. The fields stated above are required by the plugin.</p>
 			</section>
 			<section>
@@ -82,7 +83,7 @@
 					<h2><a name="client_usage" href="#client_usage">Front End Usage (Client Side)</a></h2>
 				</header>
 				<p>Front end only has one function that we need to go through. Tracking page: this page is where all your clients will be able to use for tracking of their delivery, client's will need to enter their Waybill Number and click Check Status.</p>
-				<pre><img src="images/tracking.jpg"/></pre>
+				<img src="images/tracking.jpg"/><br />
 			</section>
 			<section>
 				<header>
@@ -90,17 +91,17 @@
 					<p class="description">This section is the last and final part to the MDS Collivery plugin, in this section you the admin will be able to view orders that have not been confirmed as of yet and then either modify the delivery or accept the delivery. Once you have accepted the delivery it will be saved and you will have access to the delivery to track, view parcel images and view POD (proof of delivery).</p>
 				</header>
 				<p>Once your client has checked out and confirmed their order you will be able to view the delivery request under Orders & Shoppers -> MDS Confirm Collivery in your Virtuemart section.</p>
-				<pre><img src="images/virtuemart_section.jpg"/></pre>
-				<pre><img src="images/confirm.jpg"/></pre>
-				<pre><img src="images/confirm_delivery.jpg"/></pre>
+				<img src="images/virtuemart_section.jpg"/><br />
+				<img src="images/confirm.jpg"/><br />
+				<img src="images/confirm_delivery.jpg"/><br />
 				<p>Here you will be able to change collection address and destination address as well as the delivery service. You can even include some written instructions for the driver and add additional parcels.</p>
 				<p>Which Collection Address:  for both collection and destination just gives you the option of adding a new address to your lists of addresses in you MDS Collivery account or pick from the addresses already in that list. We have added some validation just to help make sure that the required information gets passed on to the API.</p>
 				<p>Once you have accepted the delivery the delivery will be sent to MDS Collivery and the order status will be changed to confirmed and you will be redirected to the order page in Virtuemart. There you can notify your client and gain access to the Waybill number needed to track the delivery.</p>
-				<pre><img src="images/accepted.jpg"/></pre>
+				<img src="images/accepted.jpg"/><br />
 				<p>The delivery is now saved and you can gain access to it by clicking on MDS Already Confirmed in the same menu as MDS Confirm Collivery.</p>
-				<pre><img src="images/already_confirmed.jpg"/></pre>
-				<pre><img src="images/view_delivery.jpg"/></pre>
-				<pre><img src="images/view.jpg"/></pre>
+				<img src="images/already_confirmed.jpg"/><br />
+				<img src="images/view_delivery.jpg"/><br />
+				<img src="images/view.jpg"/><br />
 			</section>
 		</div>
 		<div class="top"><a href="#top">^ Top ^</a></div>
