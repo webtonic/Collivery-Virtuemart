@@ -190,12 +190,40 @@ class plgVmShipmentMds_ShippingInstallerScript
 		$states_insert_query = "INSERT INTO `#__virtuemart_states` (`virtuemart_country_id`, `state_name`) VALUES " . $town_sql;
 		$this->db->setQuery( $states_insert_query );
 		$this->db->query();
-
+		
+		// Lets check we have some of the old fields from the old plugin and lets unpublish them
+		foreach(array('VM_SUBURB', 'VM_CITY', 'vm_suburb', 'vm_city', 'city') as $old_fields)
+		{
+			$this->db->setQuery( "SELECT * FROM `#__virtuemart_userfields` WHERE `name`='".$old_fields."';" );
+			$this->db->query();
+			if(isset($this->db->loadObjectList()[0]))
+			{
+				$this->db->setQuery( 'UPDATE `#__virtuemart_userfields` SET `published`=0 WHERE `virtuemart_userfield_id` = '.$this->db->loadObjectList()[0]->virtuemart_userfield_id.';' );
+				$this->db->query();				
+			}
+		}
+		
+		// Lets check if we have a virtuemart_state_id which our plugin uses
+		$this->db->setQuery( "SELECT * FROM `#__virtuemart_userfields` WHERE `name`='virtuemart_state_id';" );
+		$this->db->query();
+		if(isset($this->db->loadObjectList()[0]))
+		{
+			// If the field exists then lets change the wording
+			$this->db->setQuery( 'UPDATE `#__virtuemart_userfields` SET `title`="City" WHERE `virtuemart_userfield_id` = '.$this->db->loadObjectList()[0]->virtuemart_userfield_id.';' );
+			$this->db->query();
+			$fields_array = array( 'mds_suburb_id', 'mds_building_details', 'mds_location_type' );
+		}
+		else
+		{
+			$fields_array = array( 'virtuemart_state_id', 'mds_suburb_id', 'mds_building_details', 'mds_location_type' );
+			$userfields['virtuemart_state_id'] = "('virtuemart_state_id', 'City', '', 'select', '1', '1', '1', '1', '23');";
+		}
+		
 		// Create some fields needed to get prices from the API, these fields are in shipment address and billing address
-		$userfields['mds_building_details'] = "('mds_building_details', 'Building Details', 'Describe the building', 'text', '0', '1', '1', '1', '17');";
-		$userfields['mds_location_type'] = "('mds_location_type', 'Location Type', 'The type of location', 'select', '1', '1', '1', '1', '17');";
 		$userfields['mds_suburb_id'] = "('mds_suburb_id', 'Suburb', 'Suburb in town', 'select', '1', '1', '1', '1', '23');";
-		foreach ( array( 'mds_suburb_id', 'mds_building_details', 'mds_location_type' ) as $field ) {
+		$userfields['mds_location_type'] = "('mds_location_type', 'Location Type', 'The type of location', 'select', '1', '1', '1', '1', '17');";
+		$userfields['mds_building_details'] = "('mds_building_details', 'Building Details', 'Describe the building', 'text', '0', '1', '1', '1', '17');";
+		foreach ( $fields_array as $field ) {
 			$insert_query = "INSERT INTO `#__virtuemart_userfields` (`name`, `title`, `description`, `type`, `required`, `registration`, `shipment`, `account`, `ordering`) VALUES " . $userfields[$field];
 			$this->db->setQuery( $insert_query );
 			$this->db->query();
@@ -224,6 +252,31 @@ class plgVmShipmentMds_ShippingInstallerScript
 			}
 		}
 
+		// Get address_2 order number and then try and reorder our address fields
+		$this->db->setQuery( "SELECT * FROM `#__virtuemart_userfields` WHERE `name`='address_2';" );
+		$this->db->query();
+		if(isset($this->db->loadObjectList()[0]))
+		{
+			$order = $this->db->loadObjectList()[0]->ordering;
+			foreach(array('virtuemart_country_id', 'virtuemart_state_id', 'mds_suburb_id', 'mds_location_type', 'mds_building_details') as $the_field)
+			{
+				$order++;
+
+				// If we have another field with our chosen order number then lets move it down one
+				$this->db->setQuery( "SELECT * FROM `#__virtuemart_userfields` WHERE `ordering`=".$order.";" );
+				$this->db->query();
+				if(isset($this->db->loadObjectList()[0]))
+				{
+					$field_to_move = $this->db->loadObjectList()[0]->virtuemart_userfield_id;
+					$this->db->setQuery( 'UPDATE `#__virtuemart_userfields` SET `ordering`='.($order + 2).' WHERE `virtuemart_userfield_id` = '.$field_to_move.';' );
+					$this->db->query();
+				}
+				
+				$this->db->setQuery( 'UPDATE `#__virtuemart_userfields` SET `ordering`='.$order.' WHERE `name`="'.$the_field.'";' );
+				$this->db->query();					
+			}
+		}
+		
 		// Enable validation for cell phone.
 		$this->db->setQuery( 'UPDATE `#__virtuemart_userfields` SET `registration` = 1, `shipment` = 1, `account` = 1, `required` = 1 WHERE `name` = "phone_2";' );
 		$this->db->query();
