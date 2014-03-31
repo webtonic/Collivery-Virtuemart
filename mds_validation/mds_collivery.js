@@ -91,7 +91,7 @@ jQuery(document).ready(function()
                     {
                         url: base_url + "index.php?option=com_virtuemart&controller=mds&task=suburbs&town_name=" + text, success: function(result)
                         {
-                            jQuery("#mds_suburb_id").removeAttr("style", "").removeClass("chzn-done").data("chosen", null).next().remove();
+							jQuery("#mds_suburb_id").removeAttr("style", "").removeClass("chzn-done").data("chosen", null).next().remove();
                             jQuery('#mds_suburb_id').html(result).chosen();
 							
                             jQuery("#shipto_mds_suburb_id").removeAttr("style", "").removeClass("chzn-done").data("chosen", null).next().remove();
@@ -107,5 +107,4 @@ jQuery(document).ready(function()
     });
 
     // --------------------------------------------------------------------
-
 });

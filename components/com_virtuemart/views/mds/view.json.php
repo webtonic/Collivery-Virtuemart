@@ -68,15 +68,34 @@ class VirtuemartViewMds extends JView
 	function display( $tpl = null )
 	{
 		$curTask = JRequest::getWord( 'task' );
-
+		$user =& JFactory::getUser();
+		if(isset($user->id) && $user->id > 0)
+		{
+			$sel_query = "SELECT * FROM `#__virtuemart_userinfos` WHERE `virtuemart_user_id`=".$user->id.";";
+			$this->db->setQuery( $sel_query );
+			$this->db->query();
+			if(isset($this->db->loadObjectList()[0]))
+			{
+				$mds_suburb_id = $this->db->loadObjectList()[0]->mds_suburb_id;
+				$mds_location_type = $this->db->loadObjectList()[0]->mds_location_type;
+			}
+		}
+		
 		if ( $curTask == 'suburbs' ) {
 			if ( !$suburbs = $this->collivery->getSuburbs( array_search( JRequest::getVar( 'town_name' ), $this->collivery->getTowns() ) ) ) {
-				echo '<option value="0">Error retrieving contacts. Try again.</option>';
+				echo '<option value="0">Error retrieving suburbs. Try again.</option>';
 			} else {
 				$options = "";
 				foreach ( $suburbs as $key => $suburb ) {
 					if ( $key != "" && $suburb != "" ) {
-						$options .= '<option value="'.$key.'">'.$suburb.'</option>';
+						if(isset($mds_suburb_id) && $mds_suburb_id == $key)
+						{
+							$options .= '<option value="'.$key.'" selected="selected">'.$suburb.'</option>';
+						}
+						else
+						{
+							$options .= '<option value="'.$key.'">'.$suburb.'</option>';
+						}
 					}
 				}
 				echo $options;

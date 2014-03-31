@@ -42,3 +42,4 @@ CREATE TABLE IF NOT EXISTS `#__virtuemart_shipment_plg_mds_shipping` (
 ) ENGINE=InnoDB;
 
 ALTER TABLE `#__virtuemart_order_userinfos` ADD `mds_suburb_id` int(11) NOT NULL  AFTER `agreed`,  ADD `mds_building` VARCHAR(255) NOT NULL  AFTER `mds_suburb_id`,  ADD `mds_location_type` int(11) NOT NULL  AFTER `mds_building`;
+ALTER TABLE `#__virtuemart_userinfos` ADD `mds_suburb_id` int(11) NOT NULL  AFTER `zip`,  ADD `mds_building` VARCHAR(255) NOT NULL  AFTER `mds_suburb_id`,  ADD `mds_location_type` int(11) NOT NULL  AFTER `mds_building`;

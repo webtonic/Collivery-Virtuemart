@@ -409,6 +409,10 @@ class plgVmShipmentMds_ShippingInstallerScript
 		// Remove altertered colums
 		$this->db->setQuery('ALTER TABLE `#__virtuemart_order_userinfos` DROP `mds_suburb_id`, DROP `mds_building`, DROP `mds_location_type`;');
 		$this->db->query();
+		
+		// Remove altertered colums
+		$this->db->setQuery('ALTER TABLE `#__virtuemart_userinfos` DROP `mds_suburb_id`, DROP `mds_building`, DROP `mds_location_type`;');
+		$this->db->query();		
 		return true;
 	}
 
