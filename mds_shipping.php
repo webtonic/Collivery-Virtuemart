@@ -282,9 +282,14 @@ class plgVmShipmentMds_Shipping extends vmPSPlugin {
 				"cover" => $this->risk_cover
 			);
 
-			$price = $this->collivery->getPrice($data);
+			$response = $this->collivery->getPrice($data);
+			parse_str($method->shipment_params, $params);
+			$markup_ = $params['markup'];
+			$markup = "1.$markup_";
+			
+			$price = ($response['price']['ex_vat'] * $markup);
 			if ($price) {
-				return $price['price']['ex_vat'];
+				return $price;
 			} else {
 				return 0;
 			}
