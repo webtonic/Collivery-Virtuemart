@@ -96,7 +96,7 @@ unset( $services[$this->mds_service] );
 						<legend>Parcel's / Instructions / Service:</legend>
 						<label for="service">Service</label>
 						<select id="service" name="service">
-							<option value="<?php echo $this->mds_service; ?>" selected="selected"><?php echo $this->mds_services[$this->mds_service]; ?></option>
+							<option value="<?php echo $this->mds_service; ?>" selected="selected"><?php if(isset($this->mds_services[$this->mds_service])) { echo $this->mds_services[$this->mds_service]; }?></option>
 							<?php foreach ( $services as $services_key => $services_value ): ?>
 								<option value="<?php echo $services_key; ?>"><?php echo $services_value; ?></option>
 							<?php endforeach; ?>
