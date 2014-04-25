@@ -269,10 +269,9 @@ class VirtuemartViewMds extends VmView {
             $this->setLayout('index_dispatch');
 
             // Older version check
-            if (preg_replace('/[1-9]/', "", $this->vm_version) >= preg_replace('/[1-9]/', "", '2.0.26d')) {
+            if (preg_replace('/[^0-9]/', "", $this->vm_version) >= preg_replace('/[^0-9]/', "", '2.0.26d')) {
                 $model = VmModel::getModel();
                 $this->addStandardDefaultViewLists($model, 'created_on');
-                $this->lists['state_list'] = $this->renderOrderstatesList();
                 $orderslist = $model->getOrdersList();
 
                 $this->assignRef('orderstatuses', $orderStates);
@@ -302,11 +301,11 @@ class VirtuemartViewMds extends VmView {
                 $this->assignRef('pagination', $pagination);
                 $this->SetViewTitle('MDS Confirm Collivery', 'MDS shipping awaiting confirmation');
             } else {
+		// old version!
                 $model = VmModel::getModel();
                 $this->addStandardDefaultViewLists($model, 'created_on');
                 $orderStatusModel = VmModel::getModel('orderstatus');
                 $orderstates = JRequest::getWord('order_status_code', '');
-                $this->lists['state_list'] = $orderStatusModel->renderOSList($orderstates, 'order_status_code', false, ' onchange="this.form.submit();" ');
                 $orderslist = $model->getOrdersList();
 
                 $this->assignRef('orderstatuses', $orderStates);

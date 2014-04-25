@@ -22,7 +22,7 @@ unset( $services[$this->mds_service] );
 	<div class="parallel">
 		<table width="100%">
 			<tr>
-				<td style="width:33.33333333333333%;">
+				<td style="width:33.33333333333333%; overflow: scroll;">
 					<fieldset class="parallel_target">
 						<legend>Collection Details:</legend>
 						<label for="which_collection_address">Which Collection Address:</label>
@@ -91,7 +91,7 @@ unset( $services[$this->mds_service] );
 						</div>
 					</fieldset>
 				</td>
-				<td style="width:33.33333333333333%;">
+				<td style="width:33.33333333333333%; overflow: scroll;">
 					<fieldset class="parallel_target">
 						<legend>Parcel's / Instructions / Service:</legend>
 						<label for="service">Service</label>
@@ -165,7 +165,7 @@ unset( $services[$this->mds_service] );
 						<textarea cols="50" name="instructions" rows="7"></textarea>
 					</fieldset>
 				</td>
-				<td style="width:33.33333333333333%;">
+				<td style="width:33.33333333333333%; overflow: scroll;">
 					<fieldset class="parallel_target">
 						<legend>Destination Details:</legend>
 						<label for="which_destination_address">Which Address:</label>

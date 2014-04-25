@@ -13,29 +13,34 @@ class VirtueMartModelMds extends VirtueMartModelOrders {
 	 * @param unknown $uid               integer Optional user ID to get the orders of a single user
 	 * @param unknown $_ignorePagination boolean If true, ignore the Joomla pagination (for embedded use, default true)
 	 */
-	public function getOrdersList( $uid = 0, $noLimit = true )
+	public function getOrdersList($uid = 0, $noLimit = false)
 	{
+// 		vmdebug('getOrdersList');
 		$this->_noLimit = $noLimit;
 		$select = " o.*, CONCAT_WS(' ',u.first_name,u.middle_name,u.last_name) AS order_name "
-			.',u.email as order_email,pm.payment_name AS payment_method,  mds.shipment_name AS mds_service';
+		.',u.email as order_email,pm.payment_name AS payment_method, mds.shipment_name AS mds_service';
 		$from = $this->getOrdersListQuery();
+		/*		$_filter = array();
+		 if ($uid > 0) {
+		$_filter[] = ('u.virtuemart_user_id = ' . (int)$uid);
+		}*/
 
-		if ( !class_exists( 'Permissions' ) ) require JPATH_VM_ADMINISTRATOR.DS.'helpers'.DS.'permissions.php';
-		if ( !Permissions::getInstance()->check( 'admin' ) ) {
-			$myuser  =JFactory::getUser();
+		if(!class_exists('Permissions')) require(JPATH_VM_ADMINISTRATOR.DS.'helpers'.DS.'permissions.php');
+		if(!Permissions::getInstance()->check('storeadmin')){
+			$myuser		=JFactory::getUser();
 			$where[]= ' u.virtuemart_user_id = ' . (int)$myuser->id.' AND o.virtuemart_vendor_id = "1" ';
 		} else {
-			if ( empty( $uid ) ) {
+			if(empty($uid)){
 				$where[]= ' o.virtuemart_vendor_id = "1" ';
 			} else {
 				$where[]= ' u.virtuemart_user_id = ' . (int)$uid.' AND o.virtuemart_vendor_id = "1" ';
 			}
 		}
 
-		if ( $search = JRequest::getString( 'search', false ) ) {
+		if ($search = JRequest::getString('search', false)){
 
 			$search = '"%' . $this->_db->getEscaped( $search, true ) . '%"' ;
-			$search = str_replace( ' ', '%', $search );
+			$search = str_replace(' ','%',$search);
 
 			$searchFields = array();
 			$searchFields[] = 'u.first_name';
@@ -47,29 +52,29 @@ class VirtueMartModelMds extends VirtueMartModelOrders {
 			$searchFields[] = 'u.phone_1';
 			$searchFields[] = 'u.address_1';
 			$searchFields[] = 'u.zip';
-			$where[] = implode( ' LIKE '.$search.' OR ', $searchFields ) . ' LIKE '.$search.' ';
+			$where[] = implode (' LIKE '.$search.' OR ', $searchFields) . ' LIKE '.$search.' ';
+			//$where[] = ' ( u.first_name LIKE '.$search.' OR u.middle_name LIKE '.$search.' OR u.last_name LIKE '.$search.' OR `order_number` LIKE '.$search.')';
 		}
 
-		$order_status_code = "U";
-		if ( $order_status_code and $order_status_code != -1 ) {
+		$order_status_code = JRequest::getString('order_status_code', false);
+		if ($order_status_code and $order_status_code!=-1){
 			$where[] = ' o.order_status = "P" OR o.order_status = "U"';
 		}
-		// Add this so that we dont get orders that dont have our suburb and town fields
-		$where[] = ' u.mds_suburb_id != ""';
 
-		if ( count( $where ) > 0 ) {
-			$whereString = ' WHERE (' . implode( ' AND ', $where ) . ') ';
-		} else {
+		if (count ($where) > 0) {
+			$whereString = ' WHERE (' . implode (' AND ', $where) . ') ';
+		}
+		else {
 			$whereString = '';
 		}
 
-		if ( JRequest::getCmd( 'view' ) == 'orders' ) {
+		if ( JRequest::getCmd('view') == 'orders') {
 			$ordering = $this->_getOrdering();
 		} else {
 			$ordering = ' order by o.modified_on DESC';
 		}
 
-		$this->_data = $this->exeSortSearchListQuery( 0, $select, $from, $whereString, '', $ordering );
+		$this->_data = $this->exeSortSearchListQuery(0,$select,$from,$whereString,'',$ordering);
 
 		return $this->_data ;
 	}
