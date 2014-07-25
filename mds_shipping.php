@@ -95,9 +95,6 @@ class plgVmShipmentMds_Shipping extends vmPSPlugin {
 		$this->collivery = new Mds\Collivery($config);
 
 		// Get some information from the API
-		$this->towns = $this->collivery->getTowns();
-		$this->services = $this->collivery->getServices();
-		$this->location_types = $this->collivery->getLocationTypes();
 
 		// Class for converting lengths and weights
 		require_once 'UnitConvertor.php';
@@ -120,7 +117,6 @@ class plgVmShipmentMds_Shipping extends vmPSPlugin {
 	 */
 	function getTableSQLFields()
 	{
-
 		$SQLfields = array(
 			'id' => 'int(11) UNSIGNED NOT NULL AUTO_INCREMENT',
 			'virtuemart_order_id' => 'int(11) UNSIGNED',
@@ -205,7 +201,7 @@ class plgVmShipmentMds_Shipping extends vmPSPlugin {
 		$state_name = $shippingModel->getState($address['virtuemart_state_id']);
 
 		if ($method->slug == "") {
-			$mds_service = array_search($method->shipment_name, $this->services);
+			$mds_service = array_search($method->shipment_name, $this->collivery->getServices());
 		} else {
 			$mds_service = $method->slug;
 		}
@@ -284,10 +280,19 @@ class plgVmShipmentMds_Shipping extends vmPSPlugin {
 
 			$response = $this->collivery->getPrice($data);
 			parse_str($method->shipment_params, $params);
-			$markup_ = $params['markup'];
-			$markup = "1.$markup_";
-			
-			$price = ($response['price']['ex_vat'] * $markup);
+			if(is_numeric($params['markup'])) {
+				$markup = $params['markup'];
+			} else {
+				preg_match('/(?:markup="(.*?)")/', $method->shipment_params, $find_markup); // WTF no idea why I have to do this
+				if(isset($find_markup[1])) {
+					$markup = $find_markup[1];
+				} else {
+					$markup = 0;
+				}
+			}
+
+			$price = $this->addMarkup($response['price']['ex_vat'], $markup);
+
 			if ($price) {
 				return $price;
 			} else {
@@ -297,33 +302,20 @@ class plgVmShipmentMds_Shipping extends vmPSPlugin {
 	}
 
 	/**
-	 * Get Parcel Array
+	 * Adds markup to price
 	 */
-	private function get_cart_content()
+	public function addMarkup($price, $markup)
 	{
-		// Reset array to defaults
-		$cart = array(
-			'parcel_count' => 0,
-			'weight' => 0,
-			'parcels' => array()
-		);
+		$price += $price * ($markup / 100);
+		return $this->format($price);
+	}
 
-		// Loop through every product in the cart
-		$tot_parcel = 0;
-		$total_weight = 0;
-		$total_vol_weight = 0;
-		foreach ($products as $product_arr) {
-			$parcels[] = array(
-				"length" => $product_arr->product_length * $product_arr->quantity,
-				"width" => $product_arr->product_width * $product_arr->quantity,
-				"height" => $product_arr->product_height * $product_arr->quantity,
-				"weight" => $product_arr->product_weight * $product_arr->quantity
-			);
-			$tot_parcel += 1;
-			$total_weight += $product_arr->product_weight * $product_arr->quantity;
-			$total_vol_weight += ( ( $product_arr->product_length * $product_arr->quantity ) * ( $product_arr->product_width * $product_arr->quantity ) * ( $product_arr->product_height * $product_arr->quantity ) );
-		}
-		$total_vweight = $total_vol_weight / 4000;
+	/**
+	 * Format a number with grouped thousands
+	 */
+	public function format($price)
+	{
+		return number_format($price, 2, '.', '');
 	}
 
 	/**
