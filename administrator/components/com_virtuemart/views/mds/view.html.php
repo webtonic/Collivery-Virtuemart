@@ -4,14 +4,14 @@
 defined('_JEXEC') or die('Restricted access');
 
 // Load the view framework
-if (!class_exists('VmView')) {
-    require JPATH_VM_ADMINISTRATOR . DS . 'helpers' . DS . 'vmview.php';
+if (!class_exists('VmViewAdmin')) {
+    require JPATH_VM_ADMINISTRATOR . DS . 'helpers' . DS . 'vmviewadmin.php';
 }
 
-/**
+/** 
  * HTML View class
  */
-class VirtuemartViewMds extends VmView {
+class VirtuemartViewMds extends VmViewAdmin {
 
     var $db;
     var $towns;

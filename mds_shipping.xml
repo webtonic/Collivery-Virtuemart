@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<install version="1.5" type="plugin" group="vmshipment" method="upgrade">
+<extension version="2.5" type="plugin" group="vmshipment" method="upgrade">
 	<name>Shipping by MDS Collivery for VirtueMart</name>
 	<creationDate>2014-03-28</creationDate>
 	<author>MDS Collivery</author>
 	<authorEmail>integration@collivery.co.za</authorEmail>
 	<authorUrl>http://www.collivery.co.za</authorUrl>
-	<copyright>Copyright (C) 2014. MDS Collivery All rights reserved.</copyright>
+	<copyright>Copyright (C) 2015. MDS Collivery All rights reserved.</copyright>
 	<license>GNU/GPL version 3 or later: http://www.gnu.org/licenses/gpl.html</license>
 	<version>2.1.0</version>
 	<description>Advanced Shipping by MDS Collivery for VirtueMart</description>
@@ -30,4 +30,4 @@
 		<param type="vmjpluginwarning" />
 		<param name="markup" type="text" size="15" default="10" label="Percentage Markup" description="Add a markup ontop of the price"/>
 	</params>
-</install>
+</extension>
