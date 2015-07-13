@@ -25,17 +25,6 @@ class VirtueMartModelMds extends VirtueMartModelOrders {
 		$_filter[] = ('u.virtuemart_user_id = ' . (int)$uid);
 		}*/
 
-		if(!class_exists('Permissions')) require(JPATH_VM_ADMINISTRATOR.DS.'helpers'.DS.'permissions.php');
-		if(!Permissions::getInstance()->check('storeadmin')){
-			$myuser		=JFactory::getUser();
-			$where[]= ' u.virtuemart_user_id = ' . (int)$myuser->id.' AND o.virtuemart_vendor_id = "1" ';
-		} else {
-			if(empty($uid)){
-				$where[]= ' o.virtuemart_vendor_id = "1" ';
-			} else {
-				$where[]= ' u.virtuemart_user_id = ' . (int)$uid.' AND o.virtuemart_vendor_id = "1" ';
-			}
-		}
 
 		if ($search = JRequest::getString('search', false)){
 
