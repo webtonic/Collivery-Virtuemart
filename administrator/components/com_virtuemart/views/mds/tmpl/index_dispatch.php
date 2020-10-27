@@ -6,7 +6,7 @@ AdminUIHelper::startAdminArea ( $this );
 ?>
 <h1>Orders Awaiting Dispatch</h1>
 <form action="index.php" method="post" name="adminForm" id="adminForm">
-	<table class="adminlist" cellspacing="0" cellpadding="0">
+	<table class="adminlist table table-striped ui-sortable" cellspacing="0" cellpadding="0">
 		<thead>
 		<tr>
 			<th><?php echo $this->sort ( 'order_number', 'COM_VIRTUEMART_ORDER_LIST_NUMBER' )  ?></th>

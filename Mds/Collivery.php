@@ -48,6 +48,8 @@ class Collivery {
 			$this->config->user_email    = 'api@collivery.co.za';
 			$this->config->user_password = 'api123';
 		}
+
+		$this->client();
 	}
 
 	/**
@@ -625,8 +627,8 @@ class Collivery {
 
 		if ( ! isset( $data['suburb_id'] ) )
 			$this->setError( 'missing_data', 'suburb_id not set.' );
-		elseif ( ! isset( $suburbs[ $data['suburb_id'] ] ) )
-			$this->setError( 'invalid_data', 'Invalid suburb_id.' );
+		// elseif ( ! isset( $suburbs[ $data['suburb_id'] ] ) )
+			// $this->setError( 'invalid_data', 'Invalid suburb_id.' );
 
 		if ( ! isset( $data['street'] ) )
 			$this->setError( 'missing_data', 'street not set.' );

@@ -1,3 +1,5 @@
+
+
 CREATE TABLE IF NOT EXISTS `#__mds_collivery_config` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `password` varchar(55) NOT NULL,
@@ -8,9 +10,6 @@ CREATE TABLE IF NOT EXISTS `#__mds_collivery_config` (
 
 INSERT INTO `#__mds_collivery_config` (`password`, `username`, `risk_cover`) VALUES
 ('api123', 'api@collivery.co.za', 1);
-
-INSERT INTO `#__extensions` (`name`, `type`, `element`, `folder`, `enabled`, `access`, `protected`, `manifest_cache`) VALUES
-('MDS Collivery Custom Validation', 'plugin', 'mds_validation', 'vmuserfield', 1, 1, 1, '{"legacy":false,"name":"MDS Collivery Custom Validation","type":"plugin","creationDate":"2014-03-04","author":"MDS Collivery","copyright":"Copyright (C) 2014. MDS Collivery All rights reserved.","authorEmail":"integration@collivery.co.za","authorUrl":"http:\\/\\/www.collivery.co.za","version":"1","description":"Includes Jquery validation that extends virtuemart","group":""}');
 
 CREATE TABLE IF NOT EXISTS `#__mds_collivery_processed` (
   `id` int(11) NOT NULL AUTO_INCREMENT,

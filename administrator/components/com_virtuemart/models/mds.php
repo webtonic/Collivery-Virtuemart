@@ -110,14 +110,18 @@ class VirtueMartModelMds extends VirtueMartModelOrders {
 
 	function getState( $state_id )
 	{
-		// Get twon name
+				// Get twon name
 		$sel_query = "SELECT * FROM `#__virtuemart_states` WHERE `virtuemart_state_id`=".$state_id.";";
 		$this->_db->setQuery( $sel_query );
-		if ( isset( $this->_db->loadObjectList()[0] ) ) {
-			return $this->_db->loadObjectList()[0]->state_name;
-		} else {
-			return false;
-		}
+        try{
+            if ( isset( $this->_db->loadObjectList()[0] ) ) {
+                return $this->_db->loadObjectList()[0]->state_name;
+            } else {
+                return false;
+            }
+        }catch(Exception $e){
+            return false;
+        }
 	}
 
 	function getService( $method_id )
