@@ -5,7 +5,7 @@ defined('_JEXEC') or die('Restricted access');
 /**
  * Installation script for the plugin
  *
- * @copyright Copyright (C) 2014 MDS Collivery
+ * @copyright Copyright (C) 2020 MDS Collivery
  * @license GNU/GPL version 3 or later: http://www.gnu.org/copyleft/gpl.html
  */
 class plgVmShipmentMds_ShippingInstallerScript {
