@@ -3,10 +3,10 @@
 /**
  * Shipment plugin for general, rules-based shipments, like regular postal services with complex shipping cost structures
  *
- * @version 2.0.0
+ * @version 2.1.0
  * @package MDS Collivery Shipping Module
  * @subpackage Plugins - shipment
- * @copyright Copyright (C) 2014 MDS Collivery - All rights reserved.
+ * @copyright Copyright (C) 2020 MDS Collivery - All rights reserved.
  * @license GNU/GPL version 3 or later: http://www.gnu.org/copyleft/gpl.html
  * @author MDS Collivery
  */

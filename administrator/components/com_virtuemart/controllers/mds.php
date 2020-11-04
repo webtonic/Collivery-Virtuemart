@@ -46,7 +46,7 @@ class VirtuemartControllerMds extends VmController {
 		$view->display( null );
 	}
 
-	public function edit($layout)
+	public function edit($layout = 'edit')
 	{
 		$view = $this->getView( 'mds', 'html' );
 		$view->display( null );

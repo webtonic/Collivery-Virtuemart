@@ -9,7 +9,7 @@ jimport( 'joomla.application.component.view' );
 /**
  * Json View class for the VirtueMart Component
  */
-class VirtuemartViewMds extends JView
+class VirtuemartViewMds extends JViewLegacy
 {
 	var $db;
 	var $towns;

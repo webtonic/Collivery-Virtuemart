@@ -5,7 +5,7 @@ defined('_JEXEC') or die('Restricted access');
 /**
  * Installation script for the plugin
  *
- * @copyright Copyright (C) 2014 MDS Collivery
+ * @copyright Copyright (C) 2020 MDS Collivery
  * @license GNU/GPL version 3 or later: http://www.gnu.org/copyleft/gpl.html
  */
 class plgVmShipmentMds_ShippingInstallerScript {
@@ -28,7 +28,7 @@ class plgVmShipmentMds_ShippingInstallerScript {
      */
     public function __construct(JAdapterInstance $adapter) {
         // We have to check what php version we have before anything is installed.
-        if (version_compare(PHP_VERSION, '5.3.0') < 0) {
+        if (version_compare(PHP_VERSION, '7.3.0') < 0) {
             die('Your PHP version is not able to run this plugin, update to the latest version before instaling this plugin. <a href="' . JURI::base() . '">Return</a>');
         }
 
@@ -54,12 +54,11 @@ class plgVmShipmentMds_ShippingInstallerScript {
         $this->username = $this->db->loadObjectList()[0]->username;
 
         $version = new JVersion();
-        require_once preg_replace('|com_installer|i', "", JPATH_COMPONENT_ADMINISTRATOR) . 'com_virtuemart/helpers/config.php';
 
         $config = array(
             'app_name' => $this->app_info->name, // Application Name
             'app_version' => $this->app_info->version, // Application Version
-            'app_host' => 'Joomla: ' . $version->getShortVersion() . ' - Virtuemart: ' . VmConfig::getInstalledVersion(), // Framework/CMS name and version, eg 'Wordpress 3.8.1 WooCommerce 2.0.20' / ''
+ //           'app_host' => 'Joomla: ' . $version->getShortVersion() . ' - Virtuemart: ' . VmConfig::getInstalledVersion(), // Framework/CMS name and version, eg 'Wordpress 3.8.1 WooCommerce 2.0.20' / ''
             'app_url' => JURI::base(), // URL your site is hosted on
             'user_email' => $this->username,
             'user_password' => $this->password
@@ -93,16 +92,7 @@ class plgVmShipmentMds_ShippingInstallerScript {
                 $source = preg_replace('|com_installer|i', "", JPATH_PLUGINS) . '/vmshipment/mds_shipping/components/com_virtuemart';
                 $destination = preg_replace('|com_installer|i', "", JPATH_COMPONENT_SITE) . 'com_virtuemart';
                 $this->recurse_copy($source, $destination);
-            } elseif ($folder == 'mds_validation') {
-                // This installs our custom validation for our userfields
-                $dest = preg_replace('|com_installer|i', "", JPATH_PLUGINS) . '/vmuserfield';
-                if (!is_dir($dest)) {
-                    @mkdir($dest, 0755);
-                }
-
-                $source = preg_replace('|com_installer|i', "", JPATH_PLUGINS) . '/vmshipment/mds_shipping/mds_validation';
-                $destination = $dest . '/mds_validation';
-                $this->recurse_copy($source, $destination);
+        
             } elseif ($folder == 'administrator') {
                 // This installs our administration section
                 $source = preg_replace('|com_installer|i', "", JPATH_PLUGINS) . '/vmshipment/mds_shipping/administrator/components/com_virtuemart';
@@ -296,10 +286,6 @@ class plgVmShipmentMds_ShippingInstallerScript {
                 $source = preg_replace('|com_installer|i', "", JPATH_PLUGINS) . '/vmshipment/mds_shipping/components/com_virtuemart';
                 $destination = preg_replace('|com_installer|i', "", JPATH_COMPONENT_SITE) . 'com_virtuemart';
                 $this->delete_files($source, true, 0, $destination);
-            } elseif ($folder == 'mds_validation') {
-                // Lets remove the mds_validation folder and files we had our validation plugin installed in
-                $destination = preg_replace('|com_installer|i', "", JPATH_PLUGINS) . '/vmuserfield/mds_validation';
-                $this->delete_files($destination, true);
             } else {
                 // Lets remove the administration folders and files we installed
                 $source = preg_replace('|com_installer|i', "", JPATH_PLUGINS) . '/vmshipment/mds_shipping/administrator/components/com_virtuemart';
@@ -364,10 +350,7 @@ class plgVmShipmentMds_ShippingInstallerScript {
             }
         }
 
-        // Delete our validation plugin
-        $del_query = "DELETE FROM `#__extensions` WHERE `element`='mds_validation';";
-        $this->db->setQuery($del_query);
-        $this->db->query();
+  
 
         // Delete our tracking menu item
         $this->db->setQuery("DELETE FROM `#__menu` WHERE `alias`='mds-tracking';");
@@ -392,13 +375,16 @@ class plgVmShipmentMds_ShippingInstallerScript {
         // Remove altertered colums
         $this->db->setQuery('ALTER TABLE `#__virtuemart_userinfos` DROP `mds_suburb_id`, DROP `mds_building`, DROP `mds_location_type`;');
         $this->db->query();
-        return true;
+        return true;   
+
+
+ 
     }
 
     /**
      * Called on instalation to move all our files to their final resting place
      */
-    protected function recurse_copy($src, $dst) {
+     protected function recurse_copy($src, $dst) {
         $dir = opendir($src);
         if (!is_dir($dst)) {
             @mkdir($dst, 0755);
@@ -414,7 +400,6 @@ class plgVmShipmentMds_ShippingInstallerScript {
         }
         closedir($dir);
     }
-
     /**
      * Called on uninstallation to remove all our files and folders from their resting place
      */
