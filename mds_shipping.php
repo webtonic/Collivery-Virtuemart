@@ -188,9 +188,9 @@ class plgVmShipmentMds_Shipping extends vmPSPlugin {
 	function getCosts(VirtueMartCart $cart, $method, $cart_prices)
 	{
 		// If bill to address is not used then lets used ship to
-		if (empty($cart->BT) && empty($cart->ST)) {
+				if (empty($cart->BT) && count($cart->ST) < 2) {
 			return 0;
-		} elseif (empty($cart->ST)) {
+		} elseif (count($cart->ST) < 2) {
 			$address = $cart->BT;
 		} else {
 			$address = $cart->ST;
