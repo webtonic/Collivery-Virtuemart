@@ -45,14 +45,14 @@ class VirtuemartViewMds extends JViewLegacy
 		$version = new JVersion();
 		require_once preg_replace( '|com_installer|i', "", JPATH_COMPONENT_ADMINISTRATOR ).'/helpers/config.php';
 
-		$config = array(
+		$config = [
 			'app_name'      => $this->app_info->name, // Application Name
 			'app_version'   => $this->app_info->version, // Application Version
 			'app_host'      => "Joomla: ".$version->getShortVersion().' - Virtuemart: '.VmConfig::getInstalledVersion(), // Framework/CMS name and version, eg 'Wordpress 3.8.1 WooCommerce 2.0.20' / ''
 			'app_url'       => JURI::base(), // URL your site is hosted on
 			'user_email'    => $this->username,
 			'user_password' => $this->password
-		);
+		];
 
 		// Use the MDS API Files
 		require_once JPATH_PLUGINS . '/vmshipment/mds_shipping/Mds/Cache.php';
@@ -82,7 +82,7 @@ class VirtuemartViewMds extends JViewLegacy
 		}
 		
 		if ( $curTask == 'suburbs' ) {
-			if ( !$suburbs = $this->collivery->getSuburbs( array_search( JRequest::getVar( 'town_name' ), $this->collivery->getTowns() ) ) ) {
+			if ( !$suburbs = $this->collivery->make_key_value_array($this->collivery->getSuburbs( array_search( JRequest::getVar( 'town_name' ), $this->collivery->make_key_value_array($this->collivery->getTowns()))))) {
 				echo '<option value="0">Error retrieving suburbs. Try again.</option>';
 			} else {
 				$options = "";

@@ -95,10 +95,10 @@ class VirtuemartViewMds extends VmViewAdmin
         $this->collivery = new Mds\Collivery($config);
 
         // Get some information from the API
-        $this->towns = $this->collivery->getTowns();
-        $this->services = $this->collivery->getServices();
-        $this->location_types = $this->collivery->getLocationTypes();
-        $this->addresses = $this->collivery->getAddresses();
+        $this->towns = $this->collivery->make_key_value_array($this->collivery->getTowns());
+        $this->services = $this->collivery->make_key_value_array($this->collivery->getServices(), 'id', 'text');
+        $this->location_types = $this->collivery->make_key_value_array($this->collivery->getLocationTypes());
+        $this->addresses = $this->collivery->make_key_value_array($this->collivery->getAddresses());
         $this->default_address_id = [];//$this->collivery->getDefaultAddressId();
         $this->default_contacts = [];//$this->collivery->getContacts($this->default_address_id);
         $this->mds_services = [];//$this->collivery->getServices();
@@ -263,7 +263,7 @@ class VirtuemartViewMds extends VmViewAdmin
             $destination_towns = $this->towns;
             $selected_town = array_search($state_name, $destination_towns);
             unset($destination_towns[$selected_town]);
-            $destination_suburbs = $this->collivery->getSuburbs($selected_town);
+            $destination_suburbs = $this->collivery->make_key_value_array($this->collivery->getSuburbs($selected_town));
             $this->assignRef('destination_towns', $destination_towns);
 
             if ($orderst->mds_suburb_id != "") {

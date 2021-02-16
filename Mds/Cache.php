@@ -60,7 +60,7 @@ class Cache {
 
 	public function put( $name, $value, $time = 1440 )
 	{
-		$cache = array( 'value' => $value, 'valid' => time() + ( $time*60 ) );
+		$cache = [ 'value' => $value, 'valid' => time() + ( $time*60 ) ];
 		if ( file_put_contents( $this->cache_dir . $name, json_encode( $cache ) ) ) {
 			$this->cache[ $name ] = $cache;
 			return true;
@@ -71,7 +71,7 @@ class Cache {
 
 	public function forget( $name )
 	{
-		$cache = array( 'value' => '', 'valid' => 0 );
+		$cache = [ 'value' => '', 'valid' => 0 ];
 		if ( file_put_contents( $this->cache_dir . $name, json_encode( $cache ) ) ) {
 			$this->cache[ $name ] = $cache;
 			return true;

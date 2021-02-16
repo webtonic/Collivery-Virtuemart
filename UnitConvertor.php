@@ -2,38 +2,38 @@
 
 class UnitConvertor {
 
-	var $conversion_table = array();
+	var $conversion_table = [];
 	var $decimal_point;
 	var $thousand_separator;
-	var $bases = array();
+	var $bases = [];
 
 	function __construct()
 	{
 		// Kilogramme, Gramme, Milligramme, Pounds, Ounce
 		// Metres, Centimetres, Millimetres, Yards, Foot, Inches
-		$conversions = array(
-			'Weight' => array(
+		$conversions = [
+			'Weight' => [
 				'base' => 'kg',
-				'conv' => array(
+				'conv' => [
 					'g' => 1000,
 					'mg' => 1000000,
 					't' => 0.001,
 					'oz' => 35.274,
 					'lb' => 2.2046,
-				)
-			),
-			'Distance' => array(
+				]
+			],
+			'Distance' => [
 				'base' => 'km',
-				'conv' => array(
+				'conv' => [
 					'm' => 1000,
 					'cm' => 100000,
 					'mm' => 1000000,
 					'in' => 39370,
 					'ft' => 3280.8,
 					'yd' => 1093.6
-				)
-			)
-		);
+				]
+			]
+		];
 
 		while ( list( $key, $val ) = each( $conversions ) ) {
 			$this->addConversion( $val['base'], $val['conv'] );
@@ -82,13 +82,13 @@ class UnitConvertor {
 						$this->bases[$from_unit][] = $to_unit;
 
 						if ( !is_array( $val ) ) {
-							$this->conversion_table[$from_unit . "_" . $to_unit] = array( "ratio" => $val, "offset" => 0 );
+							$this->conversion_table[$from_unit . "_" . $to_unit] = [ "ratio" => $val, "offset" => 0 ];
 						}
 						else {
-							$this->conversion_table[$from_unit . "_" . $to_unit] = array(
+							$this->conversion_table[$from_unit . "_" . $to_unit] = [
 								"ratio" => $val['ratio'],
 								"offset" => ( isset( $val['offset'] ) ? $val['offset'] : 0 )
-							);
+							];
 						}
 					}
 				}
@@ -96,13 +96,13 @@ class UnitConvertor {
 					$this->bases[$from_unit][] = $key;
 
 					if ( !is_array( $val ) ) {
-						$this->conversion_table[$from_unit . "_" . $key] = array( "ratio" => $val, "offset" => 0 );
+						$this->conversion_table[$from_unit . "_" . $key] = [ "ratio" => $val, "offset" => 0 ];
 					}
 					else {
-						$this->conversion_table[$from_unit . "_" . $key] = array(
+						$this->conversion_table[$from_unit . "_" . $key] = [
 							"ratio" => $val['ratio'],
 							"offset" => ( isset( $val['offset'] ) ? $val['offset'] : 0 )
-						);
+						];
 					}
 				}
 			}

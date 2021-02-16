@@ -49,14 +49,14 @@ class VirtuemartViewMds extends JViewLegacy {
 		$version = new JVersion();
 		require_once preg_replace( '|com_installer|i', "", JPATH_COMPONENT_ADMINISTRATOR ).'/helpers/config.php';
 
-		$config = array(
+		$config = [
 			'app_name'      => $this->app_info->name, // Application Name
 			'app_version'   => $this->app_info->version, // Application Version
 			'app_host'      => "Joomla: ".$version->getShortVersion().' - Virtuemart: '.VmConfig::getInstalledVersion(), // Framework/CMS name and version, eg 'Wordpress 3.8.1 WooCommerce 2.0.20' / ''
 			'app_url'       => JURI::base(), // URL your site is hosted on
 			'user_email'    => $this->username,
 			'user_password' => $this->password
-		);
+		];
 
 		// Use the MDS API Files
 		require_once JPATH_PLUGINS . '/vmshipment/mds_shipping/Mds/Cache.php';
@@ -64,10 +64,10 @@ class VirtuemartViewMds extends JViewLegacy {
 		$this->collivery = new Mds\Collivery( $config );
 
 		// Get some information from the API
-		$this->towns = $this->collivery->getTowns();
-		$this->services = $this->collivery->getServices();
-		$this->location_types = $this->collivery->getLocationTypes();
-		$this->suburbs = $this->collivery->getSuburbs( null );
+		$this->towns = $this->collivery->make_key_value_array($this->collivery->getTowns());
+		$this->services = $this->collivery->make_key_value_array($this->collivery->getServices());
+		$this->location_types = $this->collivery->make_key_value_array($this->collivery->getLocationTypes());
+		$this->suburbs = $this->collivery->make_key_value_array($this->collivery->getSuburbs());
 	}
 
 	function display( $tpl = null )
@@ -79,13 +79,13 @@ class VirtuemartViewMds extends JViewLegacy {
 			$post = JRequest::get( 'post' );
 
 			// Now lets get the price for
-			$data = array(
+			$data = [
 				"num_package" => count( $post['parcels'] ),
 				"service" => $post['service'],
 				"parcels" => $post['parcels'],
 				"exclude_weekend" => 1,
 				'cover' => $post['cover']
-			);
+			];
 
 			// Check which collection address we using
 			if ( $post['which_collection_address'] == 'default' ) {
@@ -218,12 +218,12 @@ class VirtuemartViewMds extends JViewLegacy {
 				echo '<p class="mds_response">MDS Collivery - Virtuemart Plugin: Already up-to-date</p>';
 				die();
 			} else {
-				$result = array( 'Tows Updated: '.$town_count, 'Locations Updated: '.$location_count, 'Services Updated: '.$service_count, 'Suburbs Updated: '.$suburb_count );
+				$result = ['Tows Updated: '.$town_count, 'Locations Updated: '.$location_count, 'Services Updated: '.$service_count, 'Suburbs Updated: '.$suburb_count ];
 				echo '<p class="mds_response">'.implode( ", ", $result ).'</p>';
 				die();
 			}
 		} elseif ( $curTask == 'get_suburbs' ) {
-			if ( !$suburbs = $this->collivery->getSuburbs( array_search( JRequest::getVar( 'town_name' ), $this->collivery->getTowns() ) ) ) {
+			if ( !$suburbs = $this->collivery->make_key_value_array($this->collivery->getSuburbs( array_search( JRequest::getVar( 'town_name' ), $this->collivery->make_key_value_array($this->collivery->getTowns()))))) {
 				echo '<option value="0">Error retrieving suburbs. Try again.</option>';
 			} else {
 				$options = "";
@@ -251,7 +251,7 @@ class VirtuemartViewMds extends JViewLegacy {
 
 			// Check which collection address we using and if we need to add the address to collivery api
 			if ( $post['which_collection_address'] == 'default' ) {
-				$collection_address = array(
+				$collection_address = [
 					'company_name' => ( $post['collection_company_name'] != "" ) ? $post['collection_company_name'] : 'Private',
 					'building' => $post['collection_building_details'],
 					'street' => $post['collection_street'],
@@ -264,7 +264,7 @@ class VirtuemartViewMds extends JViewLegacy {
 					'phone' => $post['collection_phone'],
 					'cellphone' => $post['collection_cellphone'],
 					'email' => $post['collection_email']
-				);
+				];
 
 				// Check for any problems
 				if ( !$collection_address_response = $this->collivery->addAddress( $collection_address ) ) {
@@ -282,7 +282,7 @@ class VirtuemartViewMds extends JViewLegacy {
 
 			// Check which destination address we using and if we need to add the address to collivery api
 			if ( $post['which_destination_address'] == 'default' ) {
-				$destination_address = array(
+				$destination_address = [
 					'company_name' => ( $post['destination_company_name'] != "" ) ? $post['destination_company_name'] : 'Private',
 					'building' => $post['destination_building_details'],
 					'street' => $post['destination_street'],
@@ -295,7 +295,7 @@ class VirtuemartViewMds extends JViewLegacy {
 					'phone' => $post['destination_phone'],
 					'cellphone' => $post['destination_cellphone'],
 					'email' => $post['destination_email']
-				);
+				];
 
 				// Check for any problems
 				if ( !$destination_address_response = $this->collivery->addAddress( $destination_address ) ) {
@@ -310,7 +310,7 @@ class VirtuemartViewMds extends JViewLegacy {
 				$contact_to = $post['contact_to'];
 			}
 
-			$data_collivery = array(
+			$data_collivery = [
 				'collivery_from' => $collivery_from,
 				'contact_from' => $contact_from,
 				'collivery_to' => $collivery_to,
@@ -321,7 +321,7 @@ class VirtuemartViewMds extends JViewLegacy {
 				'collection_time' => $post['collection_time'],
 				'parcel_count' => count( $post['parcels'] ),
 				'parcels' => $post['parcels']
-			);
+			];
 
 			// Check for any problems validating
 			if ( !$validated = $this->collivery->validate( $data_collivery ) ) {

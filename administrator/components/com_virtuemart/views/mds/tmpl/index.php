@@ -44,7 +44,7 @@ AdminUIHelper::startAdminArea ( $this );
 				<?php
 					$link = 'index.php?option=com_virtuemart&view=mds&task=view&waybill=' . $order->waybill;
 				?>
-				<td><?php echo JHTML::_( 'link', JRoute::_( $link, false ), $order->waybill, array( 'title' => 'View the delivery' ) ); ?></td>
+				<td><?php echo JHTML::_( 'link', JRoute::_( $link, false ), $order->waybill, [ 'title' => 'View the delivery' ] ); ?></td>
 				<td><?php echo $this->services[$validation_results->service]; ?></td>
 				<td><?php echo date( "Y-m-d H:m", $validation_results->collection_time); ?></td>
 			</tr>
