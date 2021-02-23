@@ -58,7 +58,7 @@ class plgVmShipmentMds_ShippingInstallerScript {
         $config = [
             'app_name' => $this->app_info->name, // Application Name
             'app_version' => $this->app_info->version, // Application Version
-            'app_host' => 'Joomla: ' . $version->getShortVersion() . ' - Virtuemart: ' . VmConfig::getInstalledVersion(), // Framework/CMS name and version, eg 'Wordpress 3.8.1 WooCommerce 2.0.20' / ''
+       //     'app_host' => 'Joomla: ' . $version->getShortVersion() . ' - Virtuemart: ' . VmConfig::getInstalledVersion(), // Framework/CMS name and version, eg 'Wordpress 3.8.1 WooCommerce 2.0.20' / ''
             'app_url' => JURI::base(), // URL your site is hosted on
             'user_email' => $this->username,
             'user_password' => $this->password

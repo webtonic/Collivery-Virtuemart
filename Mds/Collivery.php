@@ -1,5 +1,7 @@
 <?php namespace Mds;
 
+use Exception;
+
 class Collivery {
 
 	const SDX = 1;
