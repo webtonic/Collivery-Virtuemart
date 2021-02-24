@@ -111,6 +111,8 @@ class Collivery {
             $client = curl_init($url.'?'.$query);
         }
 
+        curl_setopt($client, CURLOPT_SSL_VERIFYPEER, false);
+
         curl_setopt($client, CURLOPT_RETURNTRANSFER, true);
 
         $headerArray = [
@@ -254,7 +256,7 @@ class Collivery {
 				if ($town_id > 0) {
 					$param['town_id'] = $town_id;
 				} else {
-					$param['country_id'] = "ZAF";
+					$param['country'] = "ZAF";
 				}
                 $result = $this->consumeAPI("https://api.collivery.co.za/v3/suburbs", $param, 'GET');
             } catch (Exception $e) {
@@ -337,7 +339,7 @@ class Collivery {
                 return $this->checkError($result);
             }
         }
-
+        
         return $this->filterServices($baseServices);
     }
 

@@ -31,11 +31,11 @@ CREATE TABLE IF NOT EXISTS `#__virtuemart_shipment_plg_mds_shipping` (
   `order_weight` decimal(10,6) NOT NULL,
   `order_products` int(11) NOT NULL,
   `shipment_cost` decimal(10,2) NOT NULL,
-  `created_on` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created_on` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
   `created_by` int(11) NOT NULL DEFAULT '0',
-  `modified_on` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `modified_on` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
   `modified_by` int(11) NOT NULL DEFAULT '0',
-  `locked_on` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `locked_on` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
   `locked_by` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
