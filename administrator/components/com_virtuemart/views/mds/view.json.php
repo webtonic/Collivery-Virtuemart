@@ -65,7 +65,7 @@ class VirtuemartViewMds extends JViewLegacy {
 
 		// Get some information from the API
 		$this->towns = $this->collivery->make_key_value_array($this->collivery->getTowns());
-		$this->services = $this->collivery->make_key_value_array($this->collivery->getServices());
+		$this->services = $this->collivery->make_key_value_array($this->collivery->getServices(), 'id', 'text');
 		$this->location_types = $this->collivery->make_key_value_array($this->collivery->getLocationTypes());
 		$this->suburbs = $this->collivery->make_key_value_array($this->collivery->getSuburbs());
 	}
@@ -121,22 +121,31 @@ class VirtuemartViewMds extends JViewLegacy {
 			$this->db->setQuery( $sel_query );
 			$this->db->query();
 			$virtuemart_country_id = $this->db->loadObjectList()[0]->virtuemart_country_id;
-
 			// Go through all towns and check if the town is there
 			$town_count = 0;
-			foreach ( $this->towns as $towns_key => $towns_value ) {
-				$del_query = "SELECT * FROM `#__virtuemart_states` WHERE `virtuemart_country_id`=".$virtuemart_country_id." AND `state_name`='".addslashes( $towns_value )."';";
-				$this->db->setQuery( $del_query );
-				$this->db->query();
-				$result = $this->db->loadObjectList();
-				if ( !isset( $result[0] ) ) {
-					// Insert our missing town
-					$town_sql = "(".$virtuemart_country_id.", '" . addslashes( $towns_value ) . "');";
-					$states_insert_query = "INSERT INTO `#__virtuemart_states` (`virtuemart_country_id`, `state_name`) VALUES " . $town_sql;
-					$this->db->setQuery( $states_insert_query );
-					$this->db->query();
-					$town_count++;
+			$town_sql = "";
+
+			$db_towns_query = "SELECT `virtuemart_state_id`, `state_name` FROM `#__virtuemart_states` WHERE `virtuemart_country_id`=".$virtuemart_country_id.";";
+			$this->db->setQuery( $db_towns_query );
+			$this->db->query();
+			$result = json_decode(json_encode($this->db->loadObjectList()), true);
+			$array_result = $this->collivery->make_key_value_array($result, 'virtuemart_state_id', 'state_name');
+			$differences = array_diff($this->towns, $array_result);
+
+			foreach ( $differences as $towns_key => $towns_value ) {
+			// Insert our missing town
+				if ($town_count > 0) {
+					$town_sql .= ", (".$virtuemart_country_id.", '" . addslashes( $towns_value ) . "')";
+				} else {
+					$town_sql .= "(".$virtuemart_country_id.", '" . addslashes( $towns_value ) . "')";
 				}
+				$town_count++;
+			}
+
+			if ($town_count > 0) {
+				$states_insert_query = "INSERT INTO `#__virtuemart_states` (`virtuemart_country_id`, `state_name`) VALUES " . $town_sql . ";";
+				$this->db->setQuery( $states_insert_query );
+				$this->db->query();
 			}
 
 			// Get Userfield ID
@@ -146,21 +155,29 @@ class VirtuemartViewMds extends JViewLegacy {
 			$virtuemart_userfield_id = $this->db->loadObjectList()[0]->virtuemart_userfield_id;
 
 			// Go through all location types and check if its there or not.
+			$location_sql = "";
 			$location_count = 0;
 			foreach ( $this->location_types as $key => $value ) {
 				$del_query = "SELECT * FROM `#__virtuemart_userfield_values` WHERE `fieldtitle`='".$value."';";
 				$this->db->setQuery( $del_query );
 				$this->db->query();
 				$result = $this->db->loadObjectList();
+
 				if ( !isset( $result[0] ) ) {
 					// Insert our location type
-					$insert_values = "('" . $virtuemart_userfield_id . "', '" . addslashes( $value ) . "', '" . $key . "');";
-					$inser_value_query = "INSERT INTO `#__virtuemart_userfield_values` (`virtuemart_userfield_id`, `fieldtitle`, `fieldvalue`) VALUES " . $insert_values;
-					$this->db->setQuery( $inser_value_query );
-					$this->db->query();
+					if ($location_count > 0) {
+						$location_sql .= ", ('" . $virtuemart_userfield_id . "', '" . addslashes( $value ) . "', '" . $key . "')";
+					} else {
+						$location_sql .= "('" . $virtuemart_userfield_id . "', '" . addslashes( $value ) . "', '" . $key . "')";
+					}
 					$location_count++;
 				}
+			}
 
+			if ($location_count > 0) {
+				$inser_value_query = "INSERT INTO `#__virtuemart_userfield_values` (`virtuemart_userfield_id`, `fieldtitle`, `fieldvalue`) VALUES " . $location_sql . ";";
+				$this->db->setQuery( $inser_value_query );
+				$this->db->query();
 			}
 
 			// Go through all services and check if its there or not
@@ -202,16 +219,24 @@ class VirtuemartViewMds extends JViewLegacy {
 			$stored_suburbs = $this->db->loadAssocList( 'fieldvalue' );
 
 			// Go through all suburbs and check if its there or not
+			$suburb_sql = "";
 			$suburb_count = 0;
 			foreach ( $this->suburbs as $suburb_key => $suburb_value ) {
 				if ( !isset( $stored_suburbs[$suburb_key] ) ) {
 					// Insert our suburb
-					$suburb_insert_values = "(".$virtuemart_userfield_id.", '".addslashes( $suburb_value )."', ".$suburb_key.");";
-					$suburb_insert_query = "INSERT INTO `#__virtuemart_userfield_values` (`virtuemart_userfield_id`, `fieldtitle`, `fieldvalue`) VALUES " . $suburb_insert_values;
-					$this->db->setQuery( $suburb_insert_query );
-					$this->db->query();
+					if ($suburb_count > 0) {
+						$suburb_sql .= ", (".$virtuemart_userfield_id.", '".addslashes( $suburb_value )."', ".$suburb_key.")";
+					} else {
+						$suburb_sql .= "(".$virtuemart_userfield_id.", '".addslashes( $suburb_value )."', ".$suburb_key.")";
+					}
 					$suburb_count++;
 				}
+			}
+
+			if ($suburb_count > 0) {
+				$suburb_insert_query = "INSERT INTO `#__virtuemart_userfield_values` (`virtuemart_userfield_id`, `fieldtitle`, `fieldvalue`) VALUES " . $suburb_sql . ";";
+				$this->db->setQuery( $suburb_insert_query );
+				$this->db->query();
 			}
 
 			if ( $town_count == 0 && $location_count == 0 && $service_count == 0 && $suburb_count == 0 ) {
