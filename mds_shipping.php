@@ -471,6 +471,16 @@ class plgVmShipmentMds_Shipping extends vmPSPlugin {
 	}
 
 	/**
+	 * plgVmDeclarePluginParamsShipmentVM3
+	 * 
+	 * @param unknown $data
+	 * @return bool
+	 */
+	function plgVmDeclarePluginParamsShipmentVM3 (&$data) {
+		return $this->declarePluginParams ('shipment', $data);
+	}
+
+	/**
 	 * plgVmSetOnTablePluginParamsShipment
 	 *
 	 * @param unknown $name

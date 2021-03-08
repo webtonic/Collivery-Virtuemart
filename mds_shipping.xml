@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<extension version="2.6" type="plugin" group="vmshipment" method="upgrade">
+<extension type="plugin" group="vmshipment" method="upgrade">
 	<name>Shipping by MDS Collivery for VirtueMart</name>
-	<creationDate>2014-03-28</creationDate>
+	<creationDate>2021-12-02</creationDate>
 	<author>MDS Collivery</author>
 	<authorEmail>integration@collivery.co.za</authorEmail>
 	<authorUrl>http://www.collivery.co.za</authorUrl>
-	<copyright>Copyright (C) 2020. MDS Collivery All rights reserved.</copyright>
+	<copyright>Copyright (C) 2021. MDS Collivery All rights reserved.</copyright>
 	<license>GNU/GPL version 3 or later: http://www.gnu.org/licenses/gpl.html</license>
-	<version>2.2.0</version>
+	<version>2.2.1</version>
 	<description>Advanced Shipping by MDS Collivery for VirtueMart</description>
 	<install>
 		<sql>
@@ -25,9 +25,12 @@
 		<folder>components</folder>
 		<folder>administrator</folder>
 	</files>
-<scriptfile>mds_shipping.script.php</scriptfile>
-	<params addpath="/administrator/components/com_virtuemart/elements">
-		<param type="vmjpluginwarning" />
-		<param name="markup" type="text" size="15" default="10" label="Percentage Markup" description="Add a markup ontop of the price"/>
-	</params>
+	<scriptfile>mds_shipping.script.php</scriptfile>
+	<vmconfig>
+		<fields name="params">
+			<fieldset name="Shipping Markup" addfieldpath="/administrator/components/com_virtuemart/elements">
+				<field name="markup" type="text" size="15" default="10" label="Percentage Markup" description="Add a markup ontop of the price" />
+			</fieldset>
+		</fields>
+	</vmconfig>
 </extension>
