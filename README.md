@@ -1,4 +1,4 @@
-MDS Collivery Shipping Module
+MDS Collivery Shipping Module V 1.3 
 =============================
 
 *MDS Collivery Shipping Module for Virtuemart, an eCommerce plugin for Joomla!*
@@ -6,7 +6,7 @@ MDS Collivery Shipping Module
 Documentation
 -------------
 
-Please refer to our documentation at http://collivery.github.io/Collivery-Virtuemart
+Please refer to our documentation at https://collivery.net/integration/virtuemart
 
 This plugin makes use of our [Collivery-Client](https://github.com/Collivery/Collivery-Client) which in turn makes use of our [Webservice](http://collivery.co.za/wsdocs/).
 
