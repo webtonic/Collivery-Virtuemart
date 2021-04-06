@@ -269,6 +269,9 @@ class plgVmShipmentMds_ShippingInstallerScript {
         $this->db->setQuery('UPDATE `#__menu` SET `params` = \'' . addslashes($params) . '\' WHERE `id` = ' . $menu_id . ';');
         $this->db->query();
 
+        $this->db->setQuery("DELETE FROM `#__menu` WHERE `alias`='mds-tracking';");
+        $this->db->query();
+
         return true;
     }
 
