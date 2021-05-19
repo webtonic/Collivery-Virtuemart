@@ -60,9 +60,10 @@ class VirtuemartViewMds extends JViewLegacy
 		$this->collivery = new Mds\Collivery( $config );
 
 		// Get some information from the API
-		$this->towns = $this->collivery->getTowns();
-		$this->services = $this->collivery->getServices();
-		$this->location_types = $this->collivery->getLocationTypes();
+		$this->towns = $this->collivery->make_key_value_array($this->collivery->getTowns());
+		$this->services = $this->collivery->make_key_value_array($this->collivery->getServices(), 'id', 'text');
+		$this->location_types = $this->collivery->make_key_value_array($this->collivery->getLocationTypes());
+
 	}
 
 	function display( $tpl = null )

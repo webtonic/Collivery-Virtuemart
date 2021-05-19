@@ -74,7 +74,7 @@ class VirtuemartViewMds extends VmView
 			$this->db->setQuery( $sel_query );
 			$this->db->query();
 			if ( isset( $this->db->loadObjectList()[0] ) ) {
-				$this->assignRef( 'tracking', $this->collivery->getStatus( $post['waybill'] ) );
+				$this->assignRef( 'tracking', $this->collivery->getStatus( $post['waybill'] )['data'] );
 			} else {
 				$error = 'Your Waybill does not exist on our system.';
 				$this->assignRef( 'error', $error );

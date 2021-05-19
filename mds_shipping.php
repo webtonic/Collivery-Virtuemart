@@ -201,7 +201,7 @@ class plgVmShipmentMds_Shipping extends vmPSPlugin {
 		$state_name = $shippingModel->getState($address['virtuemart_state_id']);
 
 		if ($method->slug == "") {
-			$mds_service = array_search($method->shipment_name, $this->collivery->getServices());
+			$mds_service = array_search($method->shipment_name,$this->collivery->make_key_value_array($this->collivery->getServices()), 'id', 'text');
 		} else {
 			$mds_service = $method->slug;
 		}
@@ -217,7 +217,9 @@ class plgVmShipmentMds_Shipping extends vmPSPlugin {
 			$service_type = $method->service_type;
 
 			$default_address_id = $this->collivery->getDefaultAddressId();
-			$default_address = $this->collivery->getAddress($default_address_id);
+            $default_address_suburb = $this->collivery->getDefaultAddressSuburbId();
+            $default_address_location_Type = $this->collivery->getDefaultAddressLocationTypeId();
+            $default_address_location_Town = $this->collivery->getDefaultAddressTownId();
 			$default_contacts = $this->collivery->getContacts($default_address_id);
 			$first_contact_id = each($default_contacts);
 			$default_contact_id = $first_contact_id[0];
@@ -267,15 +269,15 @@ class plgVmShipmentMds_Shipping extends vmPSPlugin {
 
 			// Now lets get the price for
 			$data = [
-				"from_town_id" => $default_address['town_id'],
-				"from_town_type" => $default_address['location_type'],
-				"to_town_id" => $to_town_id,
-				"to_town_type" => $to_town_type,
+				"collection_town" => $default_address_location_Town,
+				"collection_location_type" => $default_address_location_Type,
+				"delivery_town" => $to_town_id,
+				"delivery_location_type" => $to_town_type,
 				"num_package" => $tot_parcel,
-				"service" => $mds_service,
+				"services" => [$mds_service],
 				"parcels" => $parcels,
 				"exclude_weekend" => 1,
-				"cover" => $this->risk_cover
+				"risk_cover" => $this->risk_cover
 			];
 
 			$response = $this->collivery->getPrice($data);
@@ -291,8 +293,7 @@ class plgVmShipmentMds_Shipping extends vmPSPlugin {
 				}
 			}
 
-			$price = $this->addMarkup($response['price']['ex_vat'], $markup);
-
+			$price = $this->addMarkup($response['data'][0]['total'], $markup);
 			if ($price) {
 				return $price;
 			} else {

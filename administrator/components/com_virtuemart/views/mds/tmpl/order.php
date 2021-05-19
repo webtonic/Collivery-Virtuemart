@@ -78,9 +78,9 @@ unset( $services[$this->mds_service] );
 						<div id="which_collection_hide_saved">
 							<label for="collivery_from">Address:</label><br />
 							<select name="collivery_from" id="collivery_from">
-								<option value="<?php echo $this->default_address_id; ?>" selected="selected"><?php echo $this->addresses[$this->default_address_id]['nice_address']; ?></option>
-								<?php foreach ( $addresses as $address ):?>
-								<option value="<?php echo $address['address_id'];?>"><?php echo $address['nice_address'];?></option>
+								<option value="<?php echo $this->default_address_id; ?>" selected="selected"><?php echo $this->addresses[$this->default_address_id]; ?></option>
+								<?php foreach ( $addresses as $address_key=>$address_value ):?>
+								<option value="<?php echo $address_key;?>"><?php echo $address_value;?></option>
 								<?php endforeach;?>
 							</select>
 							<br />
@@ -228,8 +228,8 @@ unset( $services[$this->mds_service] );
 							<label for="collivery_to">Address:</label><br />
 							<select name="collivery_to" id="collivery_to">
 								<option value="" selected="selected">---Select Below---</option>
-								<?php foreach ( $addresses as $address ):?>
-								<option value="<?php echo $address['address_id'];?>"><?php echo $address['nice_address'];?></option>
+								<?php foreach ( $addresses as $address_key=>$address_value ):?>
+								<option value="<?php echo $address_key;?>"><?php echo $address_value;?></option>
 								<?php endforeach;?>
 							</select>
 							<br />

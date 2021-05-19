@@ -75,47 +75,49 @@ class VirtuemartViewMds extends JViewLegacy {
 		$curTask = JRequest::getWord( 'task' );
 
 		if ( $curTask == 'get_quote' ) {
-			$services = $this->collivery->getServices();
+			$services = $this->collivery->make_key_value_array($this->collivery->getServices(), 'id', 'text');
 			$post = JRequest::get( 'post' );
 
 			// Now lets get the price for
 			$data = [
 				"num_package" => count( $post['parcels'] ),
-				"service" => $post['service'],
+				"services" => [$post['service']],
 				"parcels" => $post['parcels'],
 				"exclude_weekend" => 1,
-				'cover' => $post['cover']
+				'risk_cover' => $post['cover']
 			];
 
 			// Check which collection address we using
 			if ( $post['which_collection_address'] == 'default' ) {
-				$data['from_town_id'] = $post['collection_town'];
-				$data['from_town_type'] = $post['collection_location_type'];
+				$data['collection_town'] = $post['collection_town'];
+				$data['collection_location_type'] = $post['collection_location_type'];
 			} else {
-				$data['collivery_from'] = $post['collivery_from'];
+				$data['collection_address'] = $post['collivery_from'];
 				$data['contact_from'] = $post['contact_from'];
 			}
 
 			// Check which destination address we using
 			if ( $post['which_destination_address'] == 'default' ) {
-				$data['to_town_id'] = $post['destination_town'];
-				$data['to_town_type'] = $post['destination_location_type'];
+				$data['delivery_town'] = $post['destination_town'];
+				$data['delivery_location_type'] = $post['destination_location_type'];
 			} else {
-				$data['collivery_to'] = $post['collivery_to'];
+				$data['delivery_address'] = $post['collivery_to'];
 				$data['contact_to'] = $post['contact_to'];
 			}
 
 			$response = $this->collivery->getPrice( $data );
-			if ( !isset( $response['service'] ) ) {
+
+			if ( !isset( $response['data'] ) ) {
 				echo '<p class="mds_response">'.implode( ", ", $this->collivery->getErrors() ).'</p>';
 				die();
 			} else {
 				$form = "";
-				$form .= '<p class="mds_response"><b>Service: </b>'.$services[$response['service']].' - Price incl: R'.$response['price']['inc_vat'].'</p>';
+				$form .= '<p class="mds_response"><b>Service: </b>'.$services[$response['data'][0]['service_type']].' - Price incl: R'.$response['data'][0]['total'].'</p>';
 				echo $form;
 				die();
 			}
-		} elseif ( $curTask == 'update' ) {
+		}
+		elseif ( $curTask == 'update' ) {
 			// Get South Africa ID
 			$sel_query = "SELECT * FROM `#__virtuemart_countries` WHERE `country_name`='South Africa';";
 			$this->db->setQuery( $sel_query );
@@ -247,7 +249,8 @@ class VirtuemartViewMds extends JViewLegacy {
 				echo '<p class="mds_response">'.implode( ", ", $result ).'</p>';
 				die();
 			}
-		} elseif ( $curTask == 'get_suburbs' ) {
+		}
+		elseif ( $curTask == 'get_suburbs' ) {
 			if ( !$suburbs = $this->collivery->make_key_value_array($this->collivery->getSuburbs( array_search( JRequest::getVar( 'town_name' ), $this->collivery->make_key_value_array($this->collivery->getTowns()))))) {
 				echo '<option value="0">Error retrieving suburbs. Try again.</option>';
 			} else {
@@ -260,20 +263,21 @@ class VirtuemartViewMds extends JViewLegacy {
 				echo $options;
 			}
 			die();
-		} elseif ( $curTask == 'get_contacts' ) {
-			if ( !$contacts = $this->collivery->getContacts( JRequest::getVar( 'address_id' ) ) ) {
+		}
+		elseif ( $curTask == 'get_contacts' ) {
+			if ( !$contacts = $this->collivery->make_key_value_array($this->collivery->getContacts( JRequest::getVar( 'address_id' ) ), 'id', 'full_name') ) {
 				echo '<option value="0">Error retrieving contacts. Try again.</option>';
 			} else {
 				$options = "";
-				foreach ( $contacts as $contact_id => $contact ) {
-					$options .= '<option value="'.$contact_id.'">'.$contact['full_name'].'</option>';
+				foreach ( $contacts as $contacts_key => $contact_value ) {
+					$options .= '<option value="'.$contacts_key.'">'.$contact_value.'</option>';
 				}
 				echo $options;
 			}
 			die();
-		} else {
+		}
+		else {
 			$post = JRequest::get( 'post' );
-
 			// Check which collection address we using and if we need to add the address to collivery api
 			if ( $post['which_collection_address'] == 'default' ) {
 				$collection_address = [
@@ -285,10 +289,10 @@ class VirtuemartViewMds extends JViewLegacy {
 					'building' => $post['collection_building_details'],
 					'suburb_id' => $post['collection_suburb'],
 					'town_id' => $post['collection_town'],
-					'full_name' => $post['collection_full_name'],
-					'phone' => $post['collection_phone'],
-					'cellphone' => $post['collection_cellphone'],
-					'email' => $post['collection_email']
+                    'contact' => ['full_name' => $post['collection_full_name'],
+                        'work_phone' => $post['collection_phone'],
+                        'cellphone' => $post['collection_cellphone'],
+                        'email_address' => $post['collection_email']]
 				];
 
 				// Check for any problems
@@ -297,14 +301,13 @@ class VirtuemartViewMds extends JViewLegacy {
 					die();
 				} else {
 					// set the collection address and contact from the returned array
-					$collivery_from = $address_response['address_id'];
-					$contact_from = $address_response['contact_id'];
+					$collivery_from = $collection_address_response['id'];
+					$contact_from = $collection_address_response['contacts'][0]['id'];
 				}
 			} else {
 				$collivery_from = $post['collivery_from'];
 				$contact_from = $post['contact_from'];
 			}
-
 			// Check which destination address we using and if we need to add the address to collivery api
 			if ( $post['which_destination_address'] == 'default' ) {
 				$destination_address = [
@@ -316,10 +319,10 @@ class VirtuemartViewMds extends JViewLegacy {
 					'building' => $post['destination_building_details'],
 					'suburb_id' => $post['destination_suburb'],
 					'town_id' => $post['destination_town'],
-					'full_name' => $post['destination_full_name'],
-					'phone' => $post['destination_phone'],
-					'cellphone' => $post['destination_cellphone'],
-					'email' => $post['destination_email']
+                    'contact' => ['full_name' => $post['destination_full_name'],
+                        'work_phone' => $post['destination_phone'],
+                        'cellphone' => $post['destination_cellphone'],
+                        'email_address' => $post['destination_email']]
 				];
 
 				// Check for any problems
@@ -327,8 +330,8 @@ class VirtuemartViewMds extends JViewLegacy {
 					echo '<p class="mds_response">'.implode( ", ", $this->collivery->getErrors() ).'</p>';
 					die();
 				} else {
-					$collivery_to = $destination_address_response['address_id'];
-					$contact_to = $destination_address_response['contact_id'];
+					$collivery_to = $destination_address_response['id'];
+					$contact_to = $destination_address_response['contacts'][0]["id"];
 				}
 			} else {
 				$collivery_to = $post['collivery_to'];
@@ -348,34 +351,34 @@ class VirtuemartViewMds extends JViewLegacy {
 				'parcels' => $post['parcels']
 			];
 
-			// Check for any problems validating
+		/*	// Check for any problems validating
 			if ( !$validated = $this->collivery->validate( $data_collivery ) ) {
 				echo '<p class="mds_response">'.implode( ", ", $this->collivery->getErrors() ).'</p>';
 				die();
-			} else {
+			} else {*/
 				// Check for any problems adding
-				if ( !$collivery_id = $this->collivery->addCollivery( $validated ) ) {
+				if ( !$collivery_id = $this->collivery->addCollivery( $data_collivery ) ) {
 					echo '<p class="mds_response">'.implode( ", ", $this->collivery->getErrors() ).'</p>';
 					die();
 				} else {
 					// Check for any problems accepting
-					if ( !$this->collivery->acceptCollivery( $collivery_id ) ) {
+					if ( !$this->collivery->acceptCollivery( $collivery_id['data']['id']) ) {
 						echo '<p class="mds_response">'.implode( ", ", $this->collivery->getErrors() ).'</p>';
 						die();
 					} else {
 						// Save the results from validation into our table
 						// Still beta version not complete yet..
-						$validated = json_encode( $validated );
-						$insert_query = "INSERT INTO `#__mds_collivery_processed` (`status`, `validation_results`, `waybill`) VALUES (1, '".$validated."', ".$collivery_id.");";
+						$validated = json_encode( $data_collivery );
+						$insert_query = "INSERT INTO `#__mds_collivery_processed` (`status`, `validation_results`, `waybill`) VALUES (1, '".$validated."', ".$collivery_id['data']['id'].");";
 						$this->db->setQuery( $insert_query );
 						$this->db->query();
 					}
 				}
-			}
+/*			}*/
 
 			// Update the order history
 			$orderModel = VmModel::getModel( 'orders' );
-			$comment = 'Tracking Number: '.$collivery_id;
+			$comment = 'Tracking Number: '.$collivery_id['data']['id'];
 			$orderModel->_updateOrderHist( $post['virtuemart_order_id'], 'C', 0, $comment );
 
 			// Update the order status
