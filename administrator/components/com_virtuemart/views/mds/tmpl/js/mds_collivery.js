@@ -5,11 +5,9 @@ jQuery(document).ready(function()
 	// Used for setting elements heights the same as the biggest of the bunch
 	jQuery('select').each(function()
 	{
-		jQuery(this).chosen({width: "200px"});
+		jQuery(this).chosen({width: "100%"});
 
 	});
-	$('select').chosen( { width: '100%' } );
-
 
 	// --------------------------------------------------------------------
 

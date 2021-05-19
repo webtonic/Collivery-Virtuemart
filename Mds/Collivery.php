@@ -182,7 +182,6 @@ class Collivery {
                 "email" => $user_email,
                 "password" => $user_password
             ], 'POST', true);
-            error_log(print_r($authenticate));
             $authenticate = $authenticate['data'];
             if (is_array($authenticate) && isset($authenticate['api_token'])) {
                 if ($this->check_cache) {
@@ -378,7 +377,6 @@ class Collivery {
                 }
 
                 return $result['data'];
-                error_log(print_r($result['data']));
             } else {
                 return $this->checkError($result);
             }
@@ -445,7 +443,6 @@ class Collivery {
                 if ($this->check_cache) {
                     $this->cache->put('collivery.contacts.'.$this->client_id.'.'.$address_id, $result['data'], 60 * 24);
                 }
-/*                error_log(print_r($result));*/
                 return $result['data'];
             } else {
                 return $this->checkError($result);
@@ -681,7 +678,6 @@ class Collivery {
             }
 
             if (isset($result['data']['id'])) {
-                error_log(print_r($result));
                 return $result['data'];
             } else {
                 return $this->checkError($result);
@@ -745,7 +741,6 @@ class Collivery {
 	 */
     public function getPrice(array $data)
     {
-       error_log(print_r($data));
         // HERE WE GO
         $towns = $this->make_key_value_array($this->getTowns());
 
@@ -779,9 +774,6 @@ class Collivery {
             $this->catchException($e);
             return false;
         }
-/*        error_log(print_r('response:'));*/
-
-/*        error_log(print_r($result));*/
 
         if (isset($result['data'])) {
             return $result;
@@ -802,9 +794,6 @@ class Collivery {
      */
     public function addCollivery(array $data)
     {
-        error_log(print_r("addCollivery"));
-        error_log(print_r($data));
-
         $contacts_from = $this->make_key_value_array($this->getContacts($data['collivery_from']), 'id', '', true);
         $contacts_to = $this->make_key_value_array($this->getContacts($data['collivery_to']), 'id', '', true);
         $services = $this->make_key_value_array($this->getServices(), 'id', 'text');
@@ -862,7 +851,6 @@ class Collivery {
                 return false;
             }
             if (isset($result['data']['id'])) {
-                error_log(print_r($result));
                 return $result;
             } else {
                 return $this->checkError($result);
@@ -881,8 +869,6 @@ class Collivery {
      */
     public function acceptCollivery($collivery_id)
     {
-        error_log(print_r("acceptCollivery"));
-        error_log(print_r($collivery_id));
 
         try {
             $result = $this->consumeAPI("https://api.collivery.co.za/v3/status_tracking/".$collivery_id, ["status_id" => 3], 'PUT');
@@ -891,7 +877,6 @@ class Collivery {
 
             return false;
         }
-        error_log(print_r($result));
         if (isset($result['data'])) {
             if (strpos($result['data']['message'], 'accepted')) {
                 return true;
