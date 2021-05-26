@@ -23,7 +23,7 @@ class VirtuemartViewMds extends VmViewAdmin
     var $app_info;
     var $collivery;
     var $converter;
-    var $adresses;
+    var $addresses;
     var $default_address_id;
     var $default_contacts;
     var $mds_services;
@@ -95,13 +95,14 @@ class VirtuemartViewMds extends VmViewAdmin
         $this->collivery = new Mds\Collivery($config);
 
         // Get some information from the API
-        $this->towns = $this->collivery->getTowns();
-        $this->services = $this->collivery->getServices();
-        $this->location_types = $this->collivery->getLocationTypes();
-        $this->addresses = $this->collivery->getAddresses();
-        $this->default_address_id = [];//$this->collivery->getDefaultAddressId();
-        $this->default_contacts = [];//$this->collivery->getContacts($this->default_address_id);
-        $this->mds_services = [];//$this->collivery->getServices();
+        $this->towns = $this->collivery->make_key_value_array($this->collivery->getTowns());
+        $this->services = $this->collivery->make_key_value_array($this->collivery->getServices(), 'id', 'text');
+        $this->location_types = $this->collivery->make_key_value_array($this->collivery->getLocationTypes());
+        $this->addresses = $this->collivery->make_key_value_array($this->collivery->getAddresses(), 'id', 'short_text');
+        $this->default_address_id = $this->collivery->getDefaultAddressId();
+        $this->default_contacts = $this->collivery->make_key_value_array($this->collivery->getContacts($this->default_address_id), 'id', '', true);
+        $this->mds_services = $this->collivery->make_key_value_array($this->collivery->getServices(), 'id', 'text');
+
 
         // Class for converting lengths and weights
         require_once JPATH_PLUGINS . '/vmshipment/mds_shipping/UnitConvertor.php';
@@ -263,7 +264,7 @@ class VirtuemartViewMds extends VmViewAdmin
             $destination_towns = $this->towns;
             $selected_town = array_search($state_name, $destination_towns);
             unset($destination_towns[$selected_town]);
-            $destination_suburbs = $this->collivery->getSuburbs($selected_town);
+            $destination_suburbs = $this->collivery->make_key_value_array($this->collivery->getSuburbs($selected_town));
             $this->assignRef('destination_towns', $destination_towns);
 
             if ($orderst->mds_suburb_id != "") {
@@ -391,14 +392,33 @@ class VirtuemartViewMds extends VmViewAdmin
             $directory = preg_replace('|administrator/|i', "",
                     JPATH_COMPONENT) . '/views/mds/tmpl/waybills/' . $waybill;
 
-            // Do we have images of the parcels
+
+            $waybill_file_name='';
+            if ($way = $this->collivery->getWaybill($waybill)) {
+                if (!is_dir($directory)) {
+                    mkdir($directory, 0777, true);
+                }
+                $waybill_file_name = $waybill_file_name . $directory . '/' . $way['file_name'];
+                file_put_contents($directory . '/' . $way['file_name'], base64_decode($way['image']));
+            }
+
+            $rootName = trim(substr(JPATH_SITE, strrpos(JPATH_SITE, '\\')));
+            $rootName = trim(substr($rootName, strrpos($rootName, '/')));
+            $waybill_file_name = trim(substr($waybill_file_name, strrpos($waybill_file_name, $rootName)));
+            $waybill_file_name = str_replace('\\','/',$waybill_file_name);
+
+            // Do we have the waybill document
+            $pod_file_name='';
             if ($pod = $this->collivery->getPod($waybill)) {
                 if (!is_dir($directory)) {
                     mkdir($directory, 0777, true);
                 }
-
-                file_put_contents($directory . '/' . $pod['filename'], base64_decode($pod['file']));
+                $pod_file_name = $pod_file_name . $directory . '/' . $way['file_name'];
+                file_put_contents($directory . '/' . $pod['filename'], base64_decode($pod['image']));
             }
+
+            $pod_file_name = trim(substr($pod_file_name, strrpos($pod_file_name, $rootName)));
+            $pod_file_name = str_replace('\\','/',$pod_file_name);
 
             // Do we have proof of delivery
             if ($parcels = $this->collivery->getParcelImageList($waybill)) {
@@ -409,17 +429,19 @@ class VirtuemartViewMds extends VmViewAdmin
                 foreach ($parcels as $parcel) {
                     $size = $parcel['size'];
                     $mime = $parcel['mime'];
-                    $filename = $parcel['filename'];
-                    $parcel_id = $parcel['parcel_id'];
+                    $filename = $parcel['file_name'];
+                    $parcel_id = $parcel['id'];
 
                     if ($image = $this->collivery->getParcelImage($parcel_id)) {
-                        file_put_contents($directory . '/' . $filename, base64_decode($image['file']));
+                        file_put_contents($directory . '/' . $filename, base64_decode($image['image']));
                     }
                 }
             }
 
             // Get our tracking information
-            $tracking = $this->collivery->getStatus($waybill);
+
+            $tracking = $this->collivery->getStatus($waybill)['data'];
+            $tracking_waybill = $this->collivery->getCollivery($waybill)['data'];
             $validation_results = json_decode($order->validation_results);
 
             $collectionAddress = $this->collivery->getAddress($validation_results->collivery_from);
@@ -428,6 +450,7 @@ class VirtuemartViewMds extends VmViewAdmin
             $deliveryContact = $this->collivery->getContacts($validation_results->collivery_to);
 
             $this->assignRef('order', $order);
+            $this->assignRef('tracking_waybill', $tracking_waybill);
             $this->assignRef('collection_address', $collectionAddress);
             $this->assignRef('destination_address', $deliveryAddress);
             $this->assignRef('collection_contacts', $collectionContact);
@@ -442,11 +465,31 @@ class VirtuemartViewMds extends VmViewAdmin
 
             $this->assignRef('tracking', $tracking);
             $pod = glob($directory . "/*.{pdf,PDF}", GLOB_BRACE);
-            $this->assignRef('pod', $pod);
+            $this->assignRef('pod', $pod_file_name);
             $imageList = glob($directory . "/*.{jpg,JPG,jpeg,JPEG,gif,GIF,png,PNG}", GLOB_BRACE);
             $this->assignRef('image_list', $imageList);
             $view_waybill = 'https://quote.collivery.co.za/waybillpdf.php?wb=' . base64_encode($waybill) . '&output=I';
             $this->assignRef('view_waybill', $view_waybill);
+            $this->assignRef('waybill_file_name',$waybill_file_name);
+
+            $tot_parcel = 0;
+            $total_weight = 0;
+            $total_vol_weight = 0;
+
+            foreach ($validation_results->parcels as $parcel) {
+                $total_weight += $parcel->weight;
+                $total_vol_weight += (($parcel->length) * ($parcel->width) * ($parcel->height));
+            }
+
+            $total_vweight = $total_vol_weight / 4000;
+            $deliver_info = [
+                'vol_weight' => $total_vol_weight,
+                'weight'     => $total_weight,
+                'parcels'    => $parcels,
+            ];
+
+            $this->assignRef('deliver_info',$deliver_info);
+
         } elseif ($curTask == 'index') {
             $this->setLayout('index');
 

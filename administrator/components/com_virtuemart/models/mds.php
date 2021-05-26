@@ -31,7 +31,7 @@ class VirtueMartModelMds extends VirtueMartModelOrders {
 			$search = '"%' . $this->_db->getEscaped( $search, true ) . '%"' ;
 			$search = str_replace(' ','%',$search);
 
-			$searchFields = array();
+			$searchFields = [];
 			$searchFields[] = 'u.first_name';
 			$searchFields[] = 'u.middle_name';
 			$searchFields[] = 'u.last_name';

@@ -31,13 +31,13 @@ AdminUIHelper::startAdminArea ( $this );
 				<?php
 					$link = 'index.php?option=com_virtuemart&view=mds&task=edit&virtuemart_order_id=' . $order->virtuemart_order_id;
 				?>
-				<td><?php echo JHTML::_( 'link', JRoute::_( $link, false ), $order->order_number, array( 'title' => 'Change Shipping Details' ) ); ?></td>
+				<td><?php echo JHTML::_( 'link', JRoute::_( $link, false ), $order->order_number, ['title' => 'Change Shipping Details' ] ); ?></td>
 				<td><?php echo $order->order_name;?></td>
 				<td><?php echo $order->order_email;?></td>
 				<td><?php echo $order->mds_service; ?></td>
 				<td><?php echo vmJsApi::date( $order->created_on, 'LC2', true ); ?></td>
 				<td><?php echo vmJsApi::date( $order->modified_on, 'LC2', true ); ?></td>
-				<td><?php echo JHTML::_( 'link', JRoute::_( $link, false ), $order->virtuemart_order_id, array( 'title' => JText::_( 'COM_VIRTUEMART_ORDER_EDIT_ORDER_ID' ) . ' ' . $order->virtuemart_order_id ) ); ?></td>
+				<td><?php echo JHTML::_( 'link', JRoute::_( $link, false ), $order->virtuemart_order_id, [ 'title' => JText::_( 'COM_VIRTUEMART_ORDER_EDIT_ORDER_ID' ) . ' ' . $order->virtuemart_order_id ] ); ?></td>
 
 			</tr>
 				<?php

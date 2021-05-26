@@ -5,14 +5,15 @@ jQuery(document).ready(function()
 	// Used for setting elements heights the same as the biggest of the bunch
 	jQuery('select').each(function()
 	{
-		jQuery(this).chosen({width: "200px"});
-	});
+		jQuery(this).chosen({width: "100%"});
 
+	});
 
 	// --------------------------------------------------------------------
 
 	jQuery('#collection_town').change(function()
 	{
+
 		var text = jQuery("#collection_town option:selected").text();
 		jQuery.ajax(
 			{
@@ -214,7 +215,7 @@ jQuery(document).ready(function()
 						jQuery("#api_results").html(data);
 					}
 				},
-				error: function(data) {
+				error: function(xhr, textStatus, error) {
 					jQuery("#api_results").html('<div style="font-size: 15px;margin:15px 0 0 39px;color:black;">Error: Check if your session has expired and if so log back in.</div>');
 				},
 				beforeSend: function() {

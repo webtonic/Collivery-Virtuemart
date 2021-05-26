@@ -55,14 +55,14 @@ class plgVmShipmentMds_ShippingInstallerScript {
 
         $version = new JVersion();
 
-        $config = array(
+        $config = [
             'app_name' => $this->app_info->name, // Application Name
             'app_version' => $this->app_info->version, // Application Version
- //           'app_host' => 'Joomla: ' . $version->getShortVersion() . ' - Virtuemart: ' . VmConfig::getInstalledVersion(), // Framework/CMS name and version, eg 'Wordpress 3.8.1 WooCommerce 2.0.20' / ''
+       //     'app_host' => 'Joomla: ' . $version->getShortVersion() . ' - Virtuemart: ' . VmConfig::getInstalledVersion(), // Framework/CMS name and version, eg 'Wordpress 3.8.1 WooCommerce 2.0.20' / ''
             'app_url' => JURI::base(), // URL your site is hosted on
             'user_email' => $this->username,
             'user_password' => $this->password
-        );
+        ];
 
         // Use the MDS API Files
         require_once 'Mds/Cache.php';
@@ -70,10 +70,10 @@ class plgVmShipmentMds_ShippingInstallerScript {
         $collivery = new Mds\Collivery($config);
 
         // Get some information from the API
-        $this->towns = $collivery->getTowns();
-        $this->services = $collivery->getServices();
-        $this->location_types = $collivery->getLocationTypes();
-        $this->suburbs = $collivery->getSuburbs("");
+        $this->towns = $collivery->make_key_value_array($collivery->getTowns());
+        $this->services = $collivery->make_key_value_array($collivery->getServices(), 'id', 'text');
+        $this->location_types = $collivery->make_key_value_array($collivery->getLocationTypes());
+        $this->suburbs = $collivery->make_key_value_array($collivery->getSuburbs());
     }
 
     /**
@@ -86,7 +86,7 @@ class plgVmShipmentMds_ShippingInstallerScript {
         $this->init(); // Load MDS Collivery API
         // Wish Joomla had better documentation and support so functions like this are not necessary.
         // This is here to copy all files and folders to their final resting place
-        foreach (array('components', 'administrator', 'mds_validation') as $folder) {
+        foreach (['components', 'administrator', 'mds_validation'] as $folder) {
             if ($folder == 'components') {
                 // this installs our ajax controller for ajax calls
                 $source = preg_replace('|com_installer|i', "", JPATH_PLUGINS) . '/vmshipment/mds_shipping/components/com_virtuemart';
@@ -175,7 +175,7 @@ class plgVmShipmentMds_ShippingInstallerScript {
         $this->db->query();
 
         // Lets check we have some of the old fields from the old plugin and lets unpublish them
-        foreach (array('VM_SUBURB', 'VM_CITY', 'vm_suburb', 'vm_city', 'city') as $old_fields) {
+        foreach (['VM_SUBURB', 'VM_CITY', 'vm_suburb', 'vm_city', 'city'] as $old_fields) {
             $this->db->setQuery("SELECT * FROM `#__virtuemart_userfields` WHERE `name`='" . $old_fields . "';");
             $this->db->query();
             if (isset($this->db->loadObjectList()[0])) {
@@ -191,9 +191,9 @@ class plgVmShipmentMds_ShippingInstallerScript {
             // If the field exists then lets change the wording
             $this->db->setQuery('UPDATE `#__virtuemart_userfields` SET `title`="City" WHERE `virtuemart_userfield_id` = ' . $this->db->loadObjectList()[0]->virtuemart_userfield_id . ';');
             $this->db->query();
-            $fields_array = array('mds_suburb_id', 'mds_building_details', 'mds_location_type');
+            $fields_array = ['mds_suburb_id', 'mds_building_details', 'mds_location_type'];
         } else {
-            $fields_array = array('virtuemart_state_id', 'mds_suburb_id', 'mds_building_details', 'mds_location_type');
+            $fields_array = ['virtuemart_state_id', 'mds_suburb_id', 'mds_building_details', 'mds_location_type'];
             $userfields['virtuemart_state_id'] = "('virtuemart_state_id', 'City', '', 'select', '1', '1', '1', '1', '23');";
         }
 
@@ -234,7 +234,7 @@ class plgVmShipmentMds_ShippingInstallerScript {
         $this->db->query();
         if (isset($this->db->loadObjectList()[0])) {
             $order = $this->db->loadObjectList()[0]->ordering;
-            foreach (array('virtuemart_country_id', 'virtuemart_state_id', 'mds_suburb_id', 'mds_location_type', 'mds_building_details') as $the_field) {
+            foreach (['virtuemart_country_id', 'virtuemart_state_id', 'mds_suburb_id', 'mds_location_type', 'mds_building_details'] as $the_field) {
                 $order++;
 
                 // If we have another field with our chosen order number then lets move it down one
@@ -269,6 +269,9 @@ class plgVmShipmentMds_ShippingInstallerScript {
         $this->db->setQuery('UPDATE `#__menu` SET `params` = \'' . addslashes($params) . '\' WHERE `id` = ' . $menu_id . ';');
         $this->db->query();
 
+        $this->db->setQuery("DELETE FROM `#__menu` WHERE `alias`='mds-tracking';");
+        $this->db->query();
+
         return true;
     }
 
@@ -280,7 +283,7 @@ class plgVmShipmentMds_ShippingInstallerScript {
     public function uninstall(JAdapterInstance $adapter) {
         $this->init(); // Load MDS Collivery API
         // This is here to delte all files and folders from their resting place
-        foreach (array('components', 'administrator', 'mds_validation') as $folder) {
+        foreach (['components', 'administrator', 'mds_validation'] as $folder) {
             if ($folder == 'components') {
                 // Lets remove the files in the controller folder
                 $source = preg_replace('|com_installer|i', "", JPATH_PLUGINS) . '/vmshipment/mds_shipping/components/com_virtuemart';
@@ -296,7 +299,7 @@ class plgVmShipmentMds_ShippingInstallerScript {
         }
 
         // Remove our menu extensions
-        foreach (array('MDS Confirm Collivery', 'MDS Collivery Config', 'MDS Already Confirmed') as $field) {
+        foreach (['MDS Confirm Collivery', 'MDS Collivery Config', 'MDS Already Confirmed'] as $field) {
             $adminmenuentries_delete_query = "DELETE FROM `#__virtuemart_adminmenuentries` WHERE `name`='" . $field . "';";
             $this->db->setQuery($adminmenuentries_delete_query);
             $this->db->query();
@@ -332,7 +335,7 @@ class plgVmShipmentMds_ShippingInstallerScript {
         }
 
         // Create some fields needed to get prices from the API, these fields are in shipment address and billing address
-        foreach (array('mds_suburb_id', 'mds_building_details', 'mds_location_type') as $field) {
+        foreach (['mds_suburb_id', 'mds_building_details', 'mds_location_type'] as $field) {
             // Get Userfield ID so we can delete all instances
             $sel_query = "SELECT * FROM `#__virtuemart_userfields` WHERE `name`='" . $field . "';";
             $this->db->setQuery($sel_query);

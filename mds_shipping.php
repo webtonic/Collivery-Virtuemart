@@ -80,14 +80,14 @@ class plgVmShipmentMds_Shipping extends vmPSPlugin {
 		$version = new JVersion();
 		require_once preg_replace('|com_installer|i', "", JPATH_COMPONENT_ADMINISTRATOR) . '/helpers/config.php';
 
-		$config = array(
+		$config = [
 			'app_name' => $this->app_info->name, // Application Name
 			'app_version' => $this->app_info->version, // Application Version
 			'app_host' => 'Joomla: ' . $version->getShortVersion() . ' - Virtuemart: ' . VmConfig::getInstalledVersion(), // Framework/CMS name and version, eg 'Wordpress 3.8.1 WooCommerce 2.0.20' / ''
 			'app_url' => JURI::base(), // URL your site is hosted on
 			'user_email' => $this->username,
 			'user_password' => $this->password
-		);
+		];
 
 		// Use the MDS API Files
 		require_once 'Mds/Cache.php';
@@ -117,7 +117,7 @@ class plgVmShipmentMds_Shipping extends vmPSPlugin {
 	 */
 	function getTableSQLFields()
 	{
-		$SQLfields = array(
+		$SQLfields = [
 			'id' => 'int(11) UNSIGNED NOT NULL AUTO_INCREMENT',
 			'virtuemart_order_id' => 'int(11) UNSIGNED',
 			'order_number' => 'char(32)',
@@ -127,7 +127,7 @@ class plgVmShipmentMds_Shipping extends vmPSPlugin {
 			'order_weight' => 'decimal(10,6)',
 			'order_products' => 'int(11)',
 			'shipment_cost' => 'decimal(10,2)',
-		);
+		];
 
 		return $SQLfields;
 	}
@@ -201,12 +201,12 @@ class plgVmShipmentMds_Shipping extends vmPSPlugin {
 		$state_name = $shippingModel->getState($address['virtuemart_state_id']);
 
 		if ($method->slug == "") {
-			$mds_service = array_search($method->shipment_name, $this->collivery->getServices());
+			$mds_service = array_search($method->shipment_name,$this->collivery->make_key_value_array($this->collivery->getServices()), 'id', 'text');
 		} else {
 			$mds_service = $method->slug;
 		}
 
-		$to_town_id = array_search($state_name, $this->collivery->getTowns());
+		$to_town_id = array_search($state_name, $this->collivery->make_key_value_array($this->collivery->getTowns()));
 		$to_town_type = $address['mds_location_type'];
 
 		if ($method->free_shipment && $cart_prices['salesPrice'] >= $method->free_shipment) {
@@ -217,7 +217,9 @@ class plgVmShipmentMds_Shipping extends vmPSPlugin {
 			$service_type = $method->service_type;
 
 			$default_address_id = $this->collivery->getDefaultAddressId();
-			$default_address = $this->collivery->getAddress($default_address_id);
+            $default_address_suburb = $this->collivery->getDefaultAddressSuburbId();
+            $default_address_location_Type = $this->collivery->getDefaultAddressLocationTypeId();
+            $default_address_location_Town = $this->collivery->getDefaultAddressTownId();
 			$default_contacts = $this->collivery->getContacts($default_address_id);
 			$first_contact_id = each($default_contacts);
 			$default_contact_id = $first_contact_id[0];
@@ -248,12 +250,12 @@ class plgVmShipmentMds_Shipping extends vmPSPlugin {
 							$weight = $product_arr->product_weight;
 						}
 
-						$parcels[] = array(
+						$parcels[] = [
 							"length" => str_replace(",", "", $length),
 							"width" => str_replace(",", "", $width),
 							"height" => str_replace(",", "", $height),
 							"weight" => str_replace(",", "", $weight)
-						);
+						];
 
 						$tot_parcel += 1;
 						$quantity++;
@@ -266,17 +268,17 @@ class plgVmShipmentMds_Shipping extends vmPSPlugin {
 			}
 
 			// Now lets get the price for
-			$data = array(
-				"from_town_id" => $default_address['town_id'],
-				"from_town_type" => $default_address['location_type'],
-				"to_town_id" => $to_town_id,
-				"to_town_type" => $to_town_type,
+			$data = [
+				"collection_town" => $default_address_location_Town,
+				"collection_location_type" => $default_address_location_Type,
+				"delivery_town" => $to_town_id,
+				"delivery_location_type" => $to_town_type,
 				"num_package" => $tot_parcel,
-				"service" => $mds_service,
+				"services" => [$mds_service],
 				"parcels" => $parcels,
 				"exclude_weekend" => 1,
-				"cover" => $this->risk_cover
-			);
+				"risk_cover" => $this->risk_cover
+			];
 
 			$response = $this->collivery->getPrice($data);
 			parse_str($method->shipment_params, $params);
@@ -291,8 +293,7 @@ class plgVmShipmentMds_Shipping extends vmPSPlugin {
 				}
 			}
 
-			$price = $this->addMarkup($response['price']['ex_vat'], $markup);
-
+			$price = $this->addMarkup($response['data'][0]['total'], $markup);
 			if ($price) {
 				return $price;
 			} else {
