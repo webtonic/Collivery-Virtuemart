@@ -29,7 +29,7 @@ class Collivery {
 	 * @param Array   $config Configuration Array
 	 * @param Class   $cache  Caching Class with functions has, get, put, forget
 	 */
-	function __construct( array $config = [], $cache = null )
+	public function __construct( array $config = [], $cache = null )
 	{
 		if ( is_null( $cache ) ) {
 			$cache_dir = array_key_exists('cache_dir', $config) ? $config['cache_dir'] : null;
