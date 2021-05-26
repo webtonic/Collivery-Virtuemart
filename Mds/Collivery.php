@@ -11,7 +11,6 @@ class Collivery {
     const ONX_10 = 6;
 
 	protected $token;
-	protected $client;
 	protected $config;
 	protected $errors = [];
 	protected $check_cache = true;
@@ -47,7 +46,8 @@ class Collivery {
 			'user_email'    => 'api@collivery.co.za',
 			'user_password' => 'api123',
 			'demo'          => false,
-		];
+            'api_url'=> 'https://api.collivery.co.za/v3/',
+        ];
 
 		foreach ( $config as $key => $value ) {
 			$this->config->$key = $key === 'user_password' ? $value : trim($value);
@@ -56,6 +56,8 @@ class Collivery {
 		if ( $this->config->demo ) {
 			$this->config->user_email    = 'api@collivery.co.za';
 			$this->config->user_password = 'api123';
+            $this->config->api_url= 'https://api.collivery.co.za/v3/';
+
 		}
 	}
 
@@ -99,6 +101,9 @@ class Collivery {
      * @throws Exception
      */
     private function consumeAPI($url, $data, $type, $isAuthenticating = false) {
+
+        $url = $this->config->api_url.$url;
+
         if (!$isAuthenticating) {
             $data["api_token"] = $this->token ?: $this->authenticate()['api_token'];
         }
@@ -169,16 +174,14 @@ class Collivery {
         if ($settings) {
             $user_email = $settings['email'];
             $user_password = $settings['password'];
-            $token = null;
         } else {
             $user_email = $this->config->user_email;
             $user_password = $this->config->user_password;
-            $token = $this->token;
         }
 
         try {
 
-            $authenticate = $this->consumeAPI('https://api.collivery.co.za/v3/login', [
+            $authenticate = $this->consumeAPI('login', [
                 "email" => $user_email,
                 "password" => $user_password
             ], 'POST', true);
@@ -227,7 +230,7 @@ class Collivery {
             return $this->cache->get('collivery.towns.'.$country);
         } else {
             try {
-                $result = $this->consumeAPI("https://api.collivery.co.za/v3/towns", ["country" => $country, "per_page" => "0"], 'GET');
+                $result = $this->consumeAPI("towns", ["country" => $country, "per_page" => "0"], 'GET');
             } catch (Exception $e) {
                 $this->catchException($e);
 
@@ -266,7 +269,7 @@ class Collivery {
 				} else {
 					$param['country'] = "ZAF";
 				}
-                $result = $this->consumeAPI("https://api.collivery.co.za/v3/suburbs", $param, 'GET');
+                $result = $this->consumeAPI("suburbs", $param, 'GET');
             } catch (Exception $e) {
                 $this->catchException($e);
 
@@ -299,7 +302,7 @@ class Collivery {
             return $this->cache->get('collivery.location_types');
         } else {
             try {
-                $result = $this->consumeAPI("https://api.collivery.co.za/v3/location_types", ["api_token" => ""], 'GET');
+                $result = $this->consumeAPI("location_types", ["api_token" => ""], 'GET');
             } catch (Exception $e) {
                 $this->catchException($e);
                 
@@ -330,7 +333,7 @@ class Collivery {
             $baseServices = $this->cache->get('collivery.services');
         } else {
             try {
-                $result = $this->consumeAPI("https://api.collivery.co.za/v3/service_types", ["api_token" => ""], 'GET');
+                $result = $this->consumeAPI("service_types", ["api_token" => ""], 'GET');
             } catch (Exception $e) {
                 $this->catchException($e);
 
@@ -364,7 +367,7 @@ class Collivery {
             return $this->cache->get('collivery.address.'.$this->client_id.'.'.$address_id);
         } else {
             try {
-                $result = $this->consumeAPI("https://api.collivery.co.za/v3/address/".$address_id, ["api_token" => ""], 'GET');
+                $result = $this->consumeAPI("address/".$address_id, ["api_token" => ""], 'GET');
             } catch (Exception $e) {
                 $this->catchException($e);
 
@@ -400,7 +403,7 @@ class Collivery {
                 if (empty($filter)) {
                     $filter= ["per_page" => "0"];
                 }
-                $result = $this->consumeAPI("https://api.collivery.co.za/v3/address", $filter, 'GET');
+                $result = $this->consumeAPI("address", $filter, 'GET');
             } catch (Exception $e) {
                 $this->catchException($e);
 
@@ -432,7 +435,7 @@ class Collivery {
             return $this->cache->get('collivery.contacts.'.$this->client_id.'.'.$address_id);
         } else {
             try {
-                $result = $this->consumeAPI("https://api.collivery.co.za/v3/contacts", ["address_id" => $address_id], 'GET');
+                $result = $this->consumeAPI("contacts", ["address_id" => $address_id], 'GET');
             } catch (Exception $e) {
                 $this->catchException($e);
 
@@ -464,7 +467,7 @@ class Collivery {
             return $this->cache->get('collivery.pod.'.$this->client_id.'.'.$collivery_id);
         } else {
             try {
-                $result = $this->consumeAPI("https://api.collivery.co.za/v3/proofs_of_delivery/", ["waybill_id" => $collivery_id, "per_page" => "0"], 'GET');
+                $result = $this->consumeAPI("proofs_of_delivery/", ["waybill_id" => $collivery_id, "per_page" => "0"], 'GET');
             } catch (Exception $e) {
                 $this->catchException($e);
 
@@ -505,7 +508,7 @@ class Collivery {
     public function getWaybill($collivery_id)
     {
         try {
-            $result = $this->consumeAPI("https://api.collivery.co.za/v3/waybill_documents/".$collivery_id."/waybill", ["api_token" => ""], 'GET');
+            $result = $this->consumeAPI("waybill_documents/".$collivery_id."/waybill", ["api_token" => ""], 'GET');
         } catch (Exception $e) {
             $this->catchException($e);
 
@@ -533,7 +536,7 @@ class Collivery {
             return $this->cache->get('collivery.parcel_image_list.'.$this->client_id.'.'.$collivery_id);
         } else {
             try {
-                $result = $this->consumeAPI("https://api.collivery.co.za/v3/parcel_images", ["waybill_id" => $collivery_id], 'GET');
+                $result = $this->consumeAPI("parcel_images", ["waybill_id" => $collivery_id], 'GET');
             } catch (Exception $e) {
                 $this->catchException($e);
 
@@ -570,7 +573,7 @@ class Collivery {
             return $this->cache->get('collivery.parcel_image.'.$this->client_id.'.'.$parcel_id);
         } else {
             try {
-                $result = $this->consumeAPI("https://api.collivery.co.za/v3/parcel_images/".$parcel_id, ["api_token" => ""], 'GET');
+                $result = $this->consumeAPI("parcel_images/".$parcel_id, ["api_token" => ""], 'GET');
             } catch (Exception $e) {
                 $this->catchException($e);
 
@@ -603,7 +606,7 @@ class Collivery {
     public function getStatus($collivery_id)
     {
         try {
-            $result = $this->consumeAPI("https://api.collivery.co.za/v3/status_tracking/".$collivery_id, [], 'GET');
+            $result = $this->consumeAPI("status_tracking/".$collivery_id, [], 'GET');
         } catch (Exception $e) {
             $this->catchException($e);
 
@@ -660,17 +663,17 @@ class Collivery {
         }
 
         if (!isset($data['contact']['work_phone']) and !isset($data['contact']['cellphone'])) {
-            $this->setError('missing_data', 'Please supply ether a phone or cellphone number...2');
+            $this->setError('missing_data', 'Please supply ether a phone or cellphone number.');
         }
 
         if (isset($data["custom_id"]) && is_integer($data["custom_id"])) {
-            $data["custom_id"] = $data["custom_id"] == 0 || $data["custom_id"] == "0" ? null : $data["custom_id"];
+            $data["custom_id"] = $data["custom_id"] ? null : $data["custom_id"];
         }
 
         if (!$this->hasErrors()) {
             try {
-                $result = $this->consumeAPI("https://api.collivery.co.za/v3/address", $data, 'POST');
-                $this->cache->forget('collivery.addresses.'.$this->client_id);
+                $result = $this->consumeAPI("address", $data, 'POST');
+                $this->cache->forget('collivery.addresses.' . $this->client_id);
             } catch (Exception $e) {
                 $this->catchException($e);
 
@@ -681,6 +684,10 @@ class Collivery {
                 return $result['data'];
             } else {
                 return $this->checkError($result);
+            }
+        } else {
+            foreach ($this->getErrors() as $key => $val) {
+                $this->setError($key, $val);
             }
         }
     }
@@ -715,11 +722,11 @@ class Collivery {
 
         if (!$this->hasErrors()) {
             try {
-                $result = $this->consumeAPI("https://api.collivery.co.za/v3/contacts", $data, 'POST');
-                $this->cache->forget('collivery.addresses.'.$this->client_id);
+                $result = $this->consumeAPI("contacts", $data, 'POST');
+                $this->cache->forget('collivery.addresses.' . $this->client_id);
             } catch (Exception $e) {
                 $this->catchException($e);
-                
+
                 return false;
             }
 
@@ -727,6 +734,10 @@ class Collivery {
                 return $result;
             } else {
                 return $this->checkError($result);
+            }
+        } else {
+            foreach ($this->getErrors() as $key => $val) {
+                $this->setError($key, $val);
             }
         }
     }
@@ -769,7 +780,7 @@ class Collivery {
         }
 
         try {
-            $result = $this->consumeAPI("https://api.collivery.co.za/v3/quote", $data, 'POST');
+            $result = $this->consumeAPI("quote", $data, 'POST');
         } catch (Exception $e) {
             $this->catchException($e);
             return false;
@@ -844,7 +855,7 @@ class Collivery {
             ];
 
             try {
-                $result = $this->consumeAPI("https://api.collivery.co.za/v3/waybill", $newObject, 'POST');
+                $result = $this->consumeAPI("waybill", $newObject, 'POST');
             } catch (Exception $e) {
                 $this->catchException($e);
 
@@ -854,6 +865,10 @@ class Collivery {
                 return $result;
             } else {
                 return $this->checkError($result);
+            }
+        } else {
+            foreach ($this->getErrors() as $key => $val) {
+                $this->setError($key, $val);
             }
         }
     }
@@ -871,7 +886,7 @@ class Collivery {
     {
 
         try {
-            $result = $this->consumeAPI("https://api.collivery.co.za/v3/status_tracking/".$collivery_id, ["status_id" => 3], 'PUT');
+            $result = $this->consumeAPI("status_tracking/".$collivery_id, ["status_id" => 3], 'PUT');
         } catch (Exception $e) {
             $this->catchException($e);
 
@@ -902,7 +917,7 @@ class Collivery {
             return $this->cache->get('collivery.waybill.'.$this->client_id.'.'.$collivery_id);
         } else {
             try {
-                $result = $this->consumeAPI("https://api.collivery.co.za/v3/waybill/".$collivery_id, ["api_token" => ""], 'GET');
+                $result = $this->consumeAPI("waybill/".$collivery_id, ["api_token" => ""], 'GET');
             } catch (Exception $e) {
                 $this->catchException($e);
 
@@ -1076,32 +1091,35 @@ class Collivery {
 
 
     /**
-     * @return mixed
+     * @return Integer - The default address town Id;
      */
     public function getDefaultAddressTownId()
-    {if (!$this->default_address_town_id) {
-        $this->authenticate();
-    }
+    {
+        if (!$this->default_address_town_id) {
+            $this->authenticate();
+        }
         return $this->default_address_town_id;
     }
 
     /**
-     * @return mixed
+     * @return Integer - The default address suburb Id;
      */
     public function getDefaultAddressSuburbId()
-    {if (!$this->default_address_suburb_id) {
-        $this->authenticate();
-    }
+    {
+        if (!$this->default_address_suburb_id) {
+            $this->authenticate();
+        }
         return $this->default_address_suburb_id;
     }
 
     /**
-     * @return mixed
+     * @return Integer - The default address location type Id;
      */
     public function getDefaultAddressLocationTypeId()
-    {if (!$this->default_address_location_type_id) {
-        $this->authenticate();
-    }
+    {
+        if (!$this->default_address_location_type_id) {
+            $this->authenticate();
+        }
         return $this->default_address_location_type_id;
     }
 

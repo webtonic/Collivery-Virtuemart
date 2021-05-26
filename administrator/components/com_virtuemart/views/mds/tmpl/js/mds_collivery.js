@@ -148,13 +148,10 @@ jQuery(document).ready(function()
 	jQuery('#collivery_from').change(function()
 	{
 		var address_id = jQuery("#collivery_from option:selected").val();
-		console.log("address from: "+ address_id);
 		jQuery.ajax(
 			{
 				url: base_url + "index.php?option=com_virtuemart&view=mds&task=get_contacts&address_id=" + address_id, success: function(result)
 				{
-					console.log("result: "+ result);
-
 					jQuery("#contact_from_chzn").remove();
 					jQuery("#contact_from").removeAttr("style", "").removeClass("chzn-done").data("chosen", null).next().remove();
 					jQuery('#contact_from').html(result);

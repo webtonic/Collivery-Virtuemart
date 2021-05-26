@@ -75,7 +75,7 @@ class UnitConvertor {
 	function addConversion( $from_unit, $to_array )
 	{
 		if ( !isset( $this->conversion_table[$from_unit] ) ) {
-			while ( list( $key, $val ) = each( $to_array ) ) {
+            foreach ($to_array as $key => $val) {
 				if ( strstr( $key, '/' ) ) {
 					$to_units = explode( '/', $key );
 					foreach ( $to_units as $to_unit ) {
