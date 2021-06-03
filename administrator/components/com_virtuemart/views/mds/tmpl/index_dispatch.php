@@ -27,12 +27,15 @@ AdminUIHelper::startAdminArea ( $this );
 
 			foreach ( $this->orderslist as $key => $order ) {
 		?>
+                <?php
+                    if($order->order_status === 'U' || $order->order_status === 'P'){
+                ?>
 			<tr class="row<?php echo $k; ?>">
 				<?php
 					$link = 'index.php?option=com_virtuemart&view=mds&task=edit&virtuemart_order_id=' . $order->virtuemart_order_id;
 				?>
 				<td><?php echo JHTML::_( 'link', JRoute::_( $link, false ), $order->order_number, ['title' => 'Change Shipping Details' ] ); ?></td>
-				<td><?php echo $order->order_name;?></td>
+				<td><?php echo $order->order_name; echo $order->waybill;?></td>
 				<td><?php echo $order->order_email;?></td>
 				<td><?php echo $order->mds_service; ?></td>
 				<td><?php echo vmJsApi::date( $order->created_on, 'LC2', true ); ?></td>
@@ -41,6 +44,7 @@ AdminUIHelper::startAdminArea ( $this );
 
 			</tr>
 				<?php
+                }
 				$k = 1 - $k;
 				$i++;
 			}
